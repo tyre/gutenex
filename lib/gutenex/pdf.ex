@@ -209,7 +209,7 @@ defmodule Gutenex.Pdf do
     :eg_pdf.translate(pdf, x, y)
   end
 
-  def scale(pdf, scale_x, scale_y) when is_integer(scale_x), is_integer(scale_y) do
+  def scale(pdf, scale_x, scale_y) when is_integer(scale_x) and is_integer(scale_y) do
     :eg_pdf.scale(pdf, scale_x, scale_y)
   end
 
@@ -254,7 +254,7 @@ defmodule Gutenex.Pdf do
   end
 
   def set_fill_color_rgb(pdf, red, green, blue) do
-    :eg_pdf.set_fill_color_rgb(pdf,r,g,b)
+    :eg_pdf.set_fill_color_rgb(pdf, red, green, blue)
   end
 
   def set_fill_color(pdf, color) do
