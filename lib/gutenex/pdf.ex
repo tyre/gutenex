@@ -3,6 +3,18 @@ defmodule Gutenex.Pdf do
     :eg_pdf.new()
   end
 
+  def set_page(pdf, page_number) do
+    :eg_pdf.set_page(pdf, page_number)
+  end
+
+  def set_pagesize(pid, size) do
+    :eg_pdf.set_pagesize(pid, size)
+  end
+
+  def set_pagesize(pid, width, height) do
+    :eg_pdf.set_pagesize(pid, width, height)
+  end
+
   @doc """
   Exports to binary PDF format
   """
@@ -273,4 +285,17 @@ defmodule Gutenex.Pdf do
     :eg_pdf.set_stroke_gray(pdf, gray)
   end
 
+  ## Moving and showing
+
+  def move_and_show(pdf, x, y, string) do
+    :eg_pdf_lib.moveAndShow(pdf, x, y, string)
+  end
+
+  def move_and_show(pdf, x, y, string, scale) do
+    :eg_pdf_lib.moveAndShow(pdf, x, y, string, scale)
+  end
+
+  def move_and_show_rotated(pdf, x, y, string, rotation) do
+    :eg_pdf_lib.moveAndShowRot(pdf, x, y, string, rotation)
+  end
 end
