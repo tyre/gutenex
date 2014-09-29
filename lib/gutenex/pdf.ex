@@ -1,4 +1,4 @@
-defmodule Gutenex.Pdf do
+defmodule Gutenex.PDF do
   def new do
     :eg_pdf.new()
   end
@@ -298,4 +298,39 @@ defmodule Gutenex.Pdf do
   def move_and_show_rotated(pdf, x, y, string, rotation) do
     :eg_pdf_lib.moveAndShowRot(pdf, x, y, string, rotation)
   end
+
+  ## Graphics
+
+  def path(pid, type) do
+    :eg_pdf.path(pid, type)
+  end
+
+  def move_to(pid, point) do
+    :eg_pdf.move_to(pid, point)
+  end
+
+  def line(pid, from_to) do
+    :eg_pdf.line(pid, from_to)
+  end
+
+  def line(pid, from, to) do
+    :eg_pdf.line(pid, from, to)
+  end
+
+  def line(pid, x1, y1, x2, y2 ) do
+    :eg_pdf.line(pid, x1, y1, x2, y2 )
+  end
+
+  def lines(pid, line_list) do
+    :eg_pdf.lines(pid, line_list)
+  end
+
+  def poly(pid, points) do
+    :eg_pdf.poly(pid, points)
+  end
+
+  def grid(pid, x_list, y_list) do
+    :eg_pdf.grid(pid, x_list, y_list)
+  end
+
 end
