@@ -4,7 +4,7 @@ Gutenex
 ## Example
 
 ```elixir
-pid = Gutenex.Pdf.new
+pid = Gutenex.Pdf.start_link
 Gutenex.Pdf.set_pagesize(pid,:letter)
 Gutenex.Pdf.set_page(pid,1)
 Gutenex.Pdf.set_dash(pid, [1])

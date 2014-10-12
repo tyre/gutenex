@@ -1,6 +1,33 @@
 defmodule Gutenex.PDF do
-  def new do
-    :eg_pdf.new()
+  require Record
+  alias Gutenex.Geometry.Line
+
+  Record.defrecord :pdfContext, [
+    info: nil,
+    fonts: nil,
+    font_handler: nil,
+    images: %{},    # a dictionary of images
+    currentpage: nil,
+    pages: [],
+    scripts: [],
+    mediabox: nil,
+    convertMode: nil,
+    procset: {:undefined, :undefined}  # { imageb,imagec }
+  ]
+
+  def start_link() do
+    something = :eg_pdf.new()
+    IO.puts inspect something
+    case something do
+      {:ok, p} when is_pid(p) ->
+        IO.puts "Just got a normal pid back"
+        p
+      {:error, {:already_started, p}} when is_pid(p) ->
+        IO.puts "Already started, returning pid"
+        p
+      {:error, message} ->
+        IO.puts("Error starting Gutenex PDF server: #{message}")
+    end
   end
 
   def set_page(pdf, page_number) do
@@ -112,28 +139,6 @@ defmodule Gutenex.PDF do
 
   def ensure_font_gets_loaded(pdf, font_name) do
     :eg_pdf.ensure_font_gets_loaded(pdf, font_name)
-  end
-
-  # Bezier Curves
-
-  def bezier(pdf,{x1,y1},{x2,y2},{x3,y3},{x4,y4}) do
-    :eg_pdf.bezier(pdf,{x1,y1},{x2,y2},{x3,y3},{x4,y4})
-  end
-
-  def bezier(pdf,x1,y1,x2,y2,x3,y3,x4,y4) do
-    :eg_pdf.bezier(pdf,x1,y1,x2,y2,x3,y3,x4,y4)
-  end
-
-  def bezier_c(pdf,point1,point2,point3) do
-    :eg_pdf.bezier_c(pdf,point1,point2,point3)
-  end
-
-  def bezier_v(pdf, point1, point2 ) do
-    :eg_pdf.bezier_v(pdf, point1, point2 )
-  end
-
-  def bezier_y(pdf, point1, point3) do
-    :eg_pdf.bezier_y(pdf, point1, point3)
   end
 
   # Shapes
@@ -309,20 +314,20 @@ defmodule Gutenex.PDF do
     :eg_pdf.move_to(pid, point)
   end
 
-  def line(pid, from_to) do
-    :eg_pdf.line(pid, from_to)
+  def line(pid, from_to) when is_pid(pid) do
+    Line.line(from_to)
   end
 
-  def line(pid, from, to) do
-    :eg_pdf.line(pid, from, to)
+  def line(pid, from, to) when is_pid(pid) do
+    Line.line(from, to)
   end
 
-  def line(pid, x1, y1, x2, y2 ) do
-    :eg_pdf.line(pid, x1, y1, x2, y2 )
+  def line(pid, x1, y1, x2, y2) when is_pid(pid) do
+    Line.line(x1, y1, x2, y2 )
   end
 
-  def lines(pid, line_list) do
-    :eg_pdf.lines(pid, line_list)
+  def lines(pid, line_list) when is_pid(pid) do
+    Line.line(line_list)
   end
 
   def poly(pid, points) do

@@ -1,1 +1,1 @@
-%{"erlguten": {:git, "git://github.com/ztmr/erlguten.git", "6460744541a3a7a4154ae23d692d2a65e9b349ab", []}}
+%{"erlguten": {:git, "git://github.com/SenecaSystems/erlguten.git", "c02b8fc57571615837b4b369cef3fecaa609436b", []}}
