@@ -28,6 +28,4 @@ defmodule Gutenex.Geometry.Utils do
   def move_to({point_x, point_y}) do
     character_list([point_x, point_y]) ++ 'm '
   end
-
-
 end

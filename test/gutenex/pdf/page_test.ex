@@ -2,6 +2,88 @@ defmodule Gutenex.PDF.PageTest do
   use ExUnit.Case, async: true
   alias Gutenex.PDF.Page
 
+
+  test "#to_pdf with no options should build the object" do
+    expected = {:dict, [
+        {"Type", {:name, "Page"}},
+        {"Parent", {:ptr, 5, 0}},
+        {"Contents", {:ptr, 1_000, 0}}]}
+    assert Page.to_pdf(5, 1_000) ==  expected
+  end
+
+  test "#to_pdf with options should translate them to strings" do
+    options = %{last_modified: {{2014, 1, 31},{15, 15, 00}}}
+    expected = {:dict, [
+        {"Type", {:name, "Page"}},
+        {"Parent", {:ptr, 5, 0}},
+        {"Contents", {:ptr, 1_000, 0}},
+        {"LastModified", {:date, options[:last_modified]}}
+      ]}
+    assert Page.to_pdf(5, 1_000, options) ==  expected
+  end
+
+  test "#serialize nil" do
+    assert Page.serialize(nil) == " null "
+  end
+
+  test "#serialize booleans" do
+    assert Page.serialize(true) == " true "
+    assert Page.serialize(false) == " false "
+  end
+
+  test "#serialize with a integer" do
+    assert Page.serialize(112392093810293) == "112392093810293"
+  end
+
+  test "#serialize with a float should format it" do
+    assert Page.serialize(23_456.329) == "23456.33"
+  end
+
+  test "#serialize a :string" do
+    assert Page.serialize({:string, "Bubbbles!"}) == " (Bubbbles!) "
+  end
+
+  test "#serialize with an :obj" do
+    assert Page.serialize({{:obj, 1, 0}, true}) == "1 0 obj\n true \nendobj\n"
+  end
+
+  test "#serialize with a :date" do
+    assert Page.serialize({:date, {{2014, 1, 31},{15, 15, 00}}}) ==
+           " (D:20140131151500) "
+  end
+
+  test "#serialize with a :name" do
+    assert Page.serialize({:name, "Harold"}) == " /Harold "
+  end
+  # serialise({stream, S}) ->
+  #     serialise({stream,{dict,[]}, S});
+  # serialise({stream,{dict,K},L}) when is_list(L)  ->
+  #     B = list_to_binary([L]),
+  #     serialise({stream,{dict,K},B});
+  # serialise({stream,{dict,Dict},B}) when is_binary(B)  ->
+  #     Len = size(B),
+  #     NewDict = store_in_dict({"Length", Len},{dict,Dict}),
+  #     [serialise(NewDict),
+  #      "\nstream\n",B,"\nendstream\n"
+  #     ];
+  # serialise({dict,L}) ->
+  #     ["<<\n", lists:map(fun({I,J}) ->
+  #              ["/",I," ",serialise(J),"\n"]
+  #            end, L),
+  #      ">>\n"];
+  # serialise({hexstring, S}) ->
+  #     [" <",s2hs(S),"> "];
+  # serialise({ptr, I, J}) ->
+  #     [" ",eg_pdf_op:i2s(I)," ",eg_pdf_op:i2s(J)," R "];
+  # serialise({array, L}) ->
+  #     [" [ ", lists:map(fun(I) -> serialise(I) end, L), " ] "];
+  # serialise({rect, {A,B,C,D}}) ->
+  #     serialise({array,[A,B,C,D]});
+  # serialise(N) when is_integer(N) ->
+  #     [" ",eg_pdf_op:i2s(N), " "];
+  # serialise(F) when is_float(F)->
+  #       [" ", eg_pdf_op:f2s(F), " "];
+
   test "#page_size with arbitrary width and height" do
     assert Page.page_size(29_999, 38_792) == {0, 0, 29_999, 38_792}
   end

@@ -1,4 +1,95 @@
 defmodule Gutenex.PDF.Page do
+  use Gutenex.PDF.Page.PageSizes
+
+  def to_pdf(parent_reference, contents_reference, options \\ %{}) do
+    {
+      :dict,
+      [
+        {"Type", {:name, "Page"}},
+        {"Parent", {:ptr, parent_reference, 0}},
+        {"Contents", {:ptr, contents_reference, 0}} |
+        Enum.map(options, &page_option(&1))
+      ]
+    }
+  end
+
+  defp page_option({key, value}) do
+    atom_to_page_key(key) |>
+    page_option(value)
+  end
+
+
+  defp page_option("LastModified", value) do
+    {"LastModified", {:date, value}}
+  end
+
+  defp page_option(key, value) do
+    {key, value}
+  end
+
+
+  defp atom_to_page_key(:last_modified), do: "LastModified"
+  defp atom_to_page_key(:resources), do: "Resources"
+  defp atom_to_page_key(:annotations), do: "Annots"
+  defp atom_to_page_key(anything), do: anything
+
+  # def page_tree(child_references) do
+
+  # end
+
+### SERIALIZATION
+                # {:date, {{2014, 1,      31}, {15,    15,      0      }}}
+  def serialize({:date, {{year, month, day}, {hours, minutes, seconds}}}) do
+    formatted_date_string =
+      Enum.map([month, day, hours, minutes, seconds], &format_date_part(&1)) |>
+      Enum.join()
+
+    " (D:#{year}" <> formatted_date_string <> ") "
+  end
+
+  def serialize(nil) do
+    " null "
+  end
+
+  def serialize(true) do
+    " true "
+  end
+
+  def serialize(false) do
+    " false "
+  end
+
+  def serialize({:string, str}) do
+    " (#{str}) "
+  end
+
+  def serialize(float) when is_float(float) do
+    Float.to_string(float, [decimals: 2])
+  end
+
+  def serialize(integer) when is_integer(integer) do
+    Integer.to_string(integer)
+  end
+
+  def serialize({{:obj, object_number, generation_number}, object}) do
+    """
+    #{serialize object_number} #{serialize generation_number} obj
+    #{serialize object}
+    endobj
+    """
+  end
+
+  def serialize({:name, name}) do
+    " /#{name} "
+  end
+
+  defp format_date_part(integer) do
+    if integer > 10 do
+      to_string integer
+    else
+      "0#{to_string integer}"
+    end
+  end
 
   @a0 {2380, 3368}
   @a1 {1684, 2380}
@@ -158,4 +249,6 @@ defmodule Gutenex.PDF.Page do
   def page_size(:tabloid) do
     page_size(@tabloid)
   end
+
+
 end
