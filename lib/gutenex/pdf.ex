@@ -1,6 +1,7 @@
 defmodule Gutenex.PDF do
   require Record
   alias Gutenex.Geometry.Line
+  alias Gutenex.PDF.Context
 
   Record.defrecord :pdfContext, [
     info: nil,
@@ -20,14 +21,20 @@ defmodule Gutenex.PDF do
     IO.puts inspect something
     case something do
       {:ok, p} when is_pid(p) ->
-        IO.puts "Just got a normal pid back"
         p
       {:error, {:already_started, p}} when is_pid(p) ->
-        IO.puts "Already started, returning pid"
         p
       {:error, message} ->
         IO.puts("Error starting Gutenex PDF server: #{message}")
     end
+  end
+
+  def export(%Context{} = context, stream) do
+
+  end
+
+  defp build(%Context{} = context) do
+
   end
 
   def set_page(pdf, page_number) do
