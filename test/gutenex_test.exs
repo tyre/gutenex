@@ -38,10 +38,4 @@ defmodule GutenexTest do
     Gutenex.set_page(server, 2)
     assert %Gutenex.PDF.Context{current_page: 2} == Gutenex.context(server)
   end
-
-  test "#export", %{server: server} do
-    export = Gutenex.export(server)
-    IO.puts(inspect(export))
-
-  end
 end
