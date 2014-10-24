@@ -127,6 +127,8 @@ defmodule Gutenex.PDF.Page do
   #   - Encodes the payload if it knows how (it currently knows nothing)
   #   - Adds the "Length" key to the options
   # Returns the {modified_options, encoded_payload}
+  # TODO: Implement filters defined on page PDF 42 of
+  # http://partners.adobe.com/public/developer/en/pdf/PDFReference.pdf
   defp prepare_stream(options, payload) do
     options = put_in_dict(options, "Length", String.length(payload))
     {options, payload}
@@ -147,8 +149,6 @@ defmodule Gutenex.PDF.Page do
     serialized_value = String.strip(serialize(value))
     serialized_key <> " " <> serialized_value
   end
-
-
 
   defp format_date_part(integer) do
     if integer > 10 do
