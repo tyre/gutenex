@@ -94,23 +94,6 @@ defmodule Gutenex.PDF.PageTest do
            """
   end
 
-  # serialise({stream, S}) ->
-  #     serialise({stream,{dict,[]}, S});
-  # serialise({stream,{dict,K},L}) when is_list(L)  ->
-  #     B = list_to_binary([L]),
-  #     serialise({stream,{dict,K},B});
-  # serialise({stream,{dict,Dict},B}) when is_binary(B)  ->
-  #     Len = size(B),
-  #     NewDict = store_in_dict({"Length", Len},{dict,Dict}),
-  #     [
-  #       serialise(NewDict),
-  #       "\nstream\n",
-  #       B,
-  #       "\nendstream\n"
-  #     ];
-  # serialise({rect, {A,B,C,D}}) ->
-  #     serialise({array,[A,B,C,D]});
-
   test "#page_size with arbitrary width and height" do
     assert Page.page_size(29_999, 38_792) == {0, 0, 29_999, 38_792}
   end

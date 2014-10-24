@@ -33,10 +33,6 @@ defmodule Gutenex.PDF.Page do
   defp atom_to_page_key(:annotations), do: "Annots"
   defp atom_to_page_key(anything), do: anything
 
-  # def page_tree(child_references) do
-
-  # end
-
 ### SERIALIZATION
 
   def serialize(nil) do
