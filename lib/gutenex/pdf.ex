@@ -3,22 +3,8 @@ defmodule Gutenex.PDF do
   alias Gutenex.Geometry.Line
   alias Gutenex.PDF.Context
 
-  Record.defrecord :pdfContext, [
-    info: nil,
-    fonts: nil,
-    font_handler: nil,
-    images: %{},    # a dictionary of images
-    currentpage: nil,
-    pages: [],
-    scripts: [],
-    mediabox: nil,
-    convertMode: nil,
-    procset: {:undefined, :undefined}  # { imageb,imagec }
-  ]
-
   def start_link() do
     something = :eg_pdf.new()
-    IO.puts inspect something
     case something do
       {:ok, p} when is_pid(p) ->
         p
@@ -29,13 +15,13 @@ defmodule Gutenex.PDF do
     end
   end
 
-  def export(%Context{} = context, stream) do
-
+  def export(%Context{} = context, _stream) do
+    Gutenex.PDF.Image.images_summary(context.images)
   end
 
-  defp build(%Context{} = context) do
+  # defp build(%Context{} = context) do
 
-  end
+  # end
 
   def set_page(pdf, page_number) do
     :eg_pdf.set_page(pdf, page_number)

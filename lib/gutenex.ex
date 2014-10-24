@@ -92,7 +92,7 @@ defmodule Gutenex do
   """
 
   def handle_call(:export, _from, [context, stream]) do
-    {:reply, PDF.export(context, stream)}
+    {:reply, PDF.export(context, stream), [context, stream]}
   end
 
   #######################

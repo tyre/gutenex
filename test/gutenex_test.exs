@@ -40,8 +40,8 @@ defmodule GutenexTest do
   end
 
   test "#export", %{server: server} do
-    { pdf, _number_of_pages } = Gutenex.export(server)
-    IO.puts(inspect(pdf))
+    export = Gutenex.export(server)
+    IO.puts(inspect(export))
 
   end
 end

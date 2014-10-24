@@ -10,11 +10,11 @@ defmodule Gutenex.PDF.Context do
       subject: "",
       keywords: ""
     },
-    images: %{},
+    images: [],
     fonts: [],
     pages: [],
     scripts: [],
     convert_mode: "utf8_to_latin2",
     current_page: 1,
-    mediabox: Page.page_size(:letter))
+    media_box: Page.page_size(:letter))
 end
