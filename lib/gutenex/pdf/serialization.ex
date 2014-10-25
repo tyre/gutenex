@@ -56,7 +56,7 @@ defmodule Gutenex.PDF.Serialization do
     " (D:#{year}" <> formatted_date_string <> ") "
   end
 
-  def serialize({:date, {year, month, day} = date}) do
+  def serialize({:date, {_year, _month, _day} = date}) do
     serialize({:date, {date, {0, 0, 0}}})
   end
 

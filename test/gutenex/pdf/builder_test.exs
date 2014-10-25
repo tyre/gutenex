@@ -75,4 +75,32 @@ defmodule Gutenex.PDF.BuilderTest do
            {:dict, [{"Font", context.fonts }, {"XObject", image_objects },
                     {"ProcSet", {:array,[{:name, "PDF"}, {:name, "Text"}]}}]}}
   end
+
+  test "#build_catalog" do
+    assert Builder.build_catalog(99) == {:dict,[
+           {"Type", {:name, "Catalog"}},
+           {"Pages", {:ptr, 99, 0}}]}
+  end
+
+  test "#build_meta_data" do
+    context = %Context{
+      meta_data: %{
+        creator: "Thomas Paine",
+        creation_date: {{1776, 7, 4}, {15, 15, 15}},
+        producer: "Continental Congress",
+        author: "America",
+        title: "Colonial Independence",
+        subject: "Revolution",
+        keywords: "free-mp3s how-to-build-a-startup-online stock-tips"
+      }
+    }
+    {:dict, meta_data} = Builder.build_meta_data(context)
+    assert List.keyfind(meta_data, "Title", 0)        ==  {"Title", {:string, context.meta_data.title}}
+    assert List.keyfind(meta_data, "Author", 0)       ==  {"Author", {:string, context.meta_data.author}}
+    assert List.keyfind(meta_data, "Creator", 0)      ==  {"Creator", {:string, context.meta_data.creator}}
+    assert List.keyfind(meta_data, "Subject", 0)      ==  {"Subject", {:string, context.meta_data.subject}}
+    assert List.keyfind(meta_data, "Producer", 0)     ==  {"Producer", {:string, context.meta_data.producer}}
+    assert List.keyfind(meta_data, "Keywords", 0)     ==  {"Keywords", {:string, context.meta_data.keywords}}
+    assert List.keyfind(meta_data, "CreationDate", 0) ==  {"CreationDate", {:date, context.meta_data.creation_date}}
+  end
 end

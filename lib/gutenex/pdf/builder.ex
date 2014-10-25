@@ -19,15 +19,6 @@ defmodule Gutenex.PDF.Builder do
     {catalog_root_index, meta_data_index, all_objects}
   end
 
-  def build_catalog(_page_tree) do
-    nil
-  end
-
-  def build_meta_data(%Context{} = _context) do
-    nil
-  end
-
-
   # Pages are built into two objects
   # The first contains the stream of the page contents
   # The second is a dictionary describing the page, a reference to the
@@ -68,18 +59,23 @@ defmodule Gutenex.PDF.Builder do
     ]}
   end
 
-  # mkCatalogue(PageTree) ->
-  #   {dict,[{"Type",{name,"Catalog"}},
-  #    {"Pages",{ptr,PageTree,0}}]}.
+  def build_catalog(page_tree_reference) do
+    {:dict,[
+     {"Type", {:name, "Catalog"}},
+     {"Pages", {:ptr, page_tree_reference, 0}}]}
+  end
 
-  # mkInfo(I) ->
-  #   {dict,[{"Creator",{string,I#info.creator}},
-  #    {"CreationDate",{date, I#info.creationDate}},
-  #    {"Producer",{string,I#info.producer}},
-  #    {"Author",{string,I#info.author}},
-  #    {"Title",{string,I#info.title}},
-  #    {"Subject",{string,I#info.subject}},
-  #    {"Keywords",{string,I#info.keywords}}]}.
+  def build_meta_data(%Context{} = context) do
+    {:dict, [
+      {"Title", {:string, context.meta_data.title}},
+      {"Author", {:string, context.meta_data.author}},
+      {"Creator", {:string, context.meta_data.creator}},
+      {"Subject", {:string, context.meta_data.subject}},
+      {"Producer", {:string, context.meta_data.producer}},
+      {"Keywords", {:string, context.meta_data.keywords}},
+      {"CreationDate", {:date, context.meta_data.creation_date}}
+    ]}
+  end
 
   def media_box({top_left, top_right, bottom_left, bottom_right}) do
     [top_left, top_right, bottom_left, bottom_right]

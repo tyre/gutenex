@@ -1,7 +1,7 @@
 defmodule Gutenex.PDF.Context do
   alias Gutenex.PDF.Page
   defstruct(
-    info: %{
+    meta_data: %{
       creator: "Elixir",
       creation_date: :calendar.local_time(),
       producer: "Gutenex",

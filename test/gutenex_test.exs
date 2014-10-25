@@ -13,7 +13,7 @@ defmodule GutenexTest do
   test "setting the context", %{server: server} do
     assert %Gutenex.PDF.Context{} == Gutenex.context(server)
 
-    new_context = %Gutenex.PDF.Context{ info: %{ author: "Kurt Vonnegut", title: "Slaughterhouse-five"} }
+    new_context = %Gutenex.PDF.Context{ meta_data: %{ author: "Kurt Vonnegut", title: "Slaughterhouse-five"} }
     Gutenex.context(server, new_context)
 
     assert new_context == Gutenex.context(server)
