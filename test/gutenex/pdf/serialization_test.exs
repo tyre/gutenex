@@ -52,6 +52,11 @@ defmodule Gutenex.PDF.SerializationTest do
     assert Serialization.serialize({:ptr, 12, 0}) == " 12 0 R "
   end
 
+  test "#serialize with a :rect" do
+    assert Serialization.serialize({:rect, [1, 2, 3, 4]}) ==
+           " [1 2 3 4] "
+  end
+
   test "#serialize with a :hexstring" do
     assert Serialization.serialize({:hexstring, "Yay Bubbles!"}) ==
            " <59617920427562626C657321> "
