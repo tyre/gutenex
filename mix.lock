@@ -1,2 +1,3 @@
-%{"erlguten": {:git, "git://github.com/SenecaSystems/erlguten.git", "c02b8fc57571615837b4b369cef3fecaa609436b", []},
+%{"apex": {:hex, :apex, "0.3.1"},
+  "erlguten": {:git, "git://github.com/SenecaSystems/erlguten.git", "c02b8fc57571615837b4b369cef3fecaa609436b", []},
   "imagineer": {:git, "git://github.com/SenecaSystems/imagineer.git", "c017d71f8c96dbf91a4ea8f33cea77c06fb97f07", []}}

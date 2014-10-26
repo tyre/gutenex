@@ -45,6 +45,7 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize({:ptr, object_number, generation_number}) do
+    Apex.ap(["serializing a pointer!", object_number, generation_number])
     " #{object_number} #{generation_number} R "
   end
 
@@ -63,8 +64,7 @@ defmodule Gutenex.PDF.Serialization do
   def serialize({{:obj, object_number, generation_number}, object}) do
     """
     #{serialize object_number} #{serialize generation_number} obj
-    #{serialize object}
-    endobj
+    #{serialize object}endobj
     """
   end
 
@@ -128,7 +128,7 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   defp format_date_part(integer) do
-    if integer > 10 do
+    if integer >= 10 do
       to_string integer
     else
       "0#{to_string integer}"

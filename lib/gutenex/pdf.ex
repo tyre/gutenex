@@ -16,12 +16,10 @@ defmodule Gutenex.PDF do
   end
 
   def export(%Context{} = context, _stream) do
-    Gutenex.PDF.Image.images_summary(context.images)
+    Gutenex.PDF.Builder.build(context)
+    |> Gutenex.PDF.Exporter.export()
+
   end
-
-  # defp build(%Context{} = context) do
-
-  # end
 
   def set_page(pdf, page_number) do
     :eg_pdf.set_page(pdf, page_number)

@@ -17,7 +17,8 @@ defmodule Gutenex.Mixfile do
   defp deps do
     [
       { :erlguten, github: "SenecaSystems/erlguten" },
-      { :imagineer, github: "SenecaSystems/imagineer" }
+      { :imagineer, github: "SenecaSystems/imagineer" },
+      { :apex, "~>0.3.0" }
     ]
   end
 end

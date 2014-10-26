@@ -11,11 +11,12 @@ defmodule Gutenex.PDF.Builder do
     page_tree = {{:obj, page_root_index, 0},
                   build_page_tree(context, page_references, image_references)}
     catalog_root_index = current_index
-    catalog = {{:obj, catalog_root_index, 0}, build_catalog(page_tree)}
+    catalog = {{:obj, catalog_root_index, 0}, build_catalog(page_root_index)}
     meta_data_index = catalog_root_index + 1
     meta_data = {{:obj, meta_data_index, 0}, build_meta_data(context)}
 
-    all_objects = image_objects ++ page_tree ++ page_objects ++ catalog ++ meta_data
+    all_objects = image_objects ++ [page_tree | page_objects] ++ [catalog, meta_data]
+    Apex.ap(inspect(all_objects))
     {catalog_root_index, meta_data_index, all_objects}
   end
 
@@ -51,7 +52,7 @@ defmodule Gutenex.PDF.Builder do
 
   def build_page_tree(%Context{} = context, page_references, image_objects) do
     {:dict, [
-      {"Type", {:name, "Page"}},
+      {"Type", {:name, "Pages"}},
       {"Count", length(page_references)},
       {"MediaBox", {:array, media_box(context.media_box)}},
       {"Kids", {:array, page_pointers(page_references)}},
@@ -89,7 +90,7 @@ defmodule Gutenex.PDF.Builder do
 
   def page_resources(context, image_objects) do
     {:dict, [
-      {"Font", context.fonts },
+      {"Font", {:array, context.fonts }},
       {"XObject", image_objects },
       # TODO: What are procsets? Do I need to add some for images?
       {"ProcSet",

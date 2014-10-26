@@ -30,10 +30,10 @@ defmodule Gutenex.PDF.Image do
 
   def extras(%Image{format: :png, attributes: %{ color_type: 2 }}=image) do
     extra_attributes = [
-      {'Filter', {:name, 'FlateDecode'}},
-      {'BitsPerComponent', image.bit_depth},
-      {'DecodeParms', decode_params(image)},
-      {'ColorSpace', {:name, png_color(image.attributes.color_type)}}
+      {"Filter", {:name, "FlateDecode"}},
+      {"BitsPerComponent", image.bit_depth},
+      {"DecodeParms", decode_params(image)},
+      {"ColorSpace", {:name, png_color(image.attributes.color_type)}}
     ]
     { extra_attributes, []}
   end
@@ -41,10 +41,10 @@ defmodule Gutenex.PDF.Image do
   defp image_attributes(image, extra_attributes) do
     {:dict,
       [
-        {'Type', {:name, 'XObject'}},
-        {'Subtype',{:name, 'Image'}},
-        {'Width', image.width},
-        {'Height', image.height} |
+        {"Type", {:name, "XObject"}},
+        {"Subtype",{:name, "Image"}},
+        {"Width", image.width},
+        {"Height", image.height} |
         extra_attributes
       ]
     }
@@ -54,10 +54,10 @@ defmodule Gutenex.PDF.Image do
     {
       :dict,
       [
-        {'Predictor', 15},
-        {'Colors', png_bits(image.attributes.color_type)},
-        {'BitsPerComponent', image.bit_depth},
-        {'Columns', image.width}
+        {"Predictor", 15},
+        {"Colors", png_bits(image.attributes.color_type)},
+        {"BitsPerComponent", image.bit_depth},
+        {"Columns", image.width}
       ]
     }
   end
@@ -97,11 +97,11 @@ defmodule Gutenex.PDF.Image do
     end
   end
 
-  defp png_color(0), do: 'DeviceGray'
-  defp png_color(2), do: 'DeviceRGB'
-  defp png_color(3), do: 'DeviceGray'
-  defp png_color(4), do: 'DeviceGray'
-  defp png_color(6), do: 'DeviceRGB'
+  defp png_color(0), do: "DeviceGray"
+  defp png_color(2), do: "DeviceRGB"
+  defp png_color(3), do: "DeviceGray"
+  defp png_color(4), do: "DeviceGray"
+  defp png_color(6), do: "DeviceRGB"
 
   defp png_bits(0), do: 1
   defp png_bits(2), do: 3
