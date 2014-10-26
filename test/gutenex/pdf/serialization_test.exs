@@ -45,12 +45,7 @@ defmodule Gutenex.PDF.SerializationTest do
 
   test "#serialize with a :dict" do
     assert Serialization.serialize({:dict, [{"Key", "Value"}, {"Numbers", {:array, [1, 2, 3]}}, {"Nope", nil}]}) ==
-    """
-    <<
-    /Key (Value)
-    /Numbers [1,2,3]
-    >>
-    """
+    "<</Key (Value)/Numbers [1,2,3]>>"
   end
 
   test "#serialize with a :ptr" do
@@ -65,9 +60,7 @@ defmodule Gutenex.PDF.SerializationTest do
   test "#serialize with a :stream with no options" do
     assert Serialization.serialize({:stream, "AHHHHHHHHHHHHHHHHHH"}) ==
            """
-           <<
-           /Length 19
-           >>
+           <</Length 19>>
            stream
            AHHHHHHHHHHHHHHHHHH
            endstream

@@ -22,9 +22,10 @@ defmodule Gutenex.PDF do
 
   def add_page(%Context{} = context, stream) do
     next_page_number = context.current_page + 1
-    new_context = %Context{ context | current_page: next_page_number,
-      pages: Enum.reverse([stream | context.pages]) }
-    {new_context, <<>>}
+    %Context{ context |
+      current_page: next_page_number,
+      pages: Enum.reverse([stream | context.pages])
+    }
   end
 
   def set_page(%Context{} = context, _stream) do

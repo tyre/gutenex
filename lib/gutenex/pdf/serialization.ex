@@ -76,7 +76,7 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize({:dict, pairs}) when is_list(pairs) do
-    "<<#{serialize_dictionary_pairs(pairs)}>>"
+    "<<#{serialize_dictionary_pairs(pairs)}>>\n"
   end
 
   def serialize({:stream, {:dict, options}, payload}) when is_binary(payload) do

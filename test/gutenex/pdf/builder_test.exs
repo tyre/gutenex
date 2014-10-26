@@ -50,9 +50,9 @@ defmodule Gutenex.PDF.BuilderTest do
     image_objects = [{:array, [1,2,3]}, {:ptr, 1, 0}]
     assert Builder.page_resources(context, image_objects) == {
       :dict, [
-        {"Font", context.fonts },
+        {"Font", {:array, context.fonts} },
         {"XObject", image_objects },
-        {"ProcSet", {:array,[{:name, "PDF"}, {:name, "Text"}]}}
+        {"ProcSet", {:array,[{:name, "PDF"}, {:name, "Text"}, {:name, "ImageC"}]}}
       ]
     }
   end
@@ -65,15 +65,15 @@ defmodule Gutenex.PDF.BuilderTest do
 
     {:dict, page_tree } = Builder.build_page_tree(context, page_references, image_objects)
 
-    assert List.keyfind(page_tree, "Type", 0)      == {"Type", {:name, "Page"}}
+    assert List.keyfind(page_tree, "Type", 0)      == {"Type", {:name, "Pages"}}
     assert List.keyfind(page_tree, "Kids", 0)      ==
            {"Kids", {:array, [{:ptr, 4, 0}, {:ptr, 8, 0}, {:ptr, 15, 0},
                               {:ptr, 16, 0}, {:ptr, 23, 0}, {:ptr, 42, 0}]}}
     assert List.keyfind(page_tree, "Count", 0)     == {"Count", 6}
     assert List.keyfind(page_tree, "MediaBox", 0)  == {"MediaBox", {:array, [0, 0, 2380, 3368]}}
     assert List.keyfind(page_tree, "Resources", 0) == {"Resources",
-           {:dict, [{"Font", context.fonts }, {"XObject", image_objects },
-                    {"ProcSet", {:array,[{:name, "PDF"}, {:name, "Text"}]}}]}}
+           {:dict, [{"Font", {:array, context.fonts}}, {"XObject", image_objects },
+                    {"ProcSet", {:array,[{:name, "PDF"}, {:name, "Text"}, {:name, "ImageC"}]}}]}}
   end
 
   test "#build_catalog" do

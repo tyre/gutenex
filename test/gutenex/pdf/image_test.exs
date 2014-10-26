@@ -5,7 +5,7 @@ defmodule Gutenex.PDF.ImageTest do
     image = %Imagineer.Image{uri: "./test/support/images/alpaca.png"} |>
             Imagineer.Image.load() |>
             Imagineer.Image.process()
-    x_object = {1,[{{:obj, 1, 0}, {:stream, {:dict, [{'Type', {:name, 'XObject'}}, {'Subtype', {:name, 'Image'}}, {'Width', 96}, {'Height', 96}, {'Filter', {:name, 'FlateDecode'}}, {'BitsPerComponent', 8}, {'DecodeParms', {:dict, [{'Predictor', 15}, {'Colors', 3}, {'BitsPerComponent', 8}, {'Columns', 96}]}}, {'ColorSpace', {:name, 'DeviceRGB'}}]}, image.content}}, []]}
+    x_object = {1,[{{:obj, 1, 0}, {:stream, {:dict, [{"Type", {:name, "XObject"}}, {"Subtype", {:name, "Image"}}, {"Width", 96}, {"Height", 96}, {"Filter", {:name, "FlateDecode"}}, {"BitsPerComponent", 8}, {"DecodeParms", {:dict, [{"Predictor", 15}, {"Colors", 3}, {"BitsPerComponent", 8}, {"Columns", 96}]}}, {"ColorSpace", {:name, "DeviceRGB"}}]}, image.content}}, []]}
     {:ok, %{image: image, x_object: x_object}}
   end
 
