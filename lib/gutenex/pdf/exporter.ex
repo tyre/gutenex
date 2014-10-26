@@ -1,10 +1,13 @@
 defmodule Gutenex.PDF.Exporter do
 
-  @start_mark "%PDF-1.4\n"
+  # Declare the PDF version and a magic comment to imply binary data
+  @start_mark """
+  %PDF-1.4
+  %‚„œ”
+  """
   @end_mark "%%EOF\r\n"
 
   def export({root_index, meta_data_index, objects}) do
-    # sorted_objects = List.keysort(objects)
     serialized_objects =
       Enum.map(objects, &Gutenex.PDF.Serialization.serialize/1)
     @start_mark <>

@@ -97,7 +97,8 @@ defmodule Gutenex.PDF.Builder do
         {:array,
           [
             {:name, "PDF"},
-            {:name, "Text"}
+            {:name, "Text"},
+            {:name, "ImageC"}
           ]
         }
       }

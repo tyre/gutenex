@@ -64,7 +64,8 @@ defmodule Gutenex.PDF.Serialization do
   def serialize({{:obj, object_number, generation_number}, object}) do
     """
     #{serialize object_number} #{serialize generation_number} obj
-    #{serialize object}endobj
+    #{serialize object}
+    endobj
     """
   end
 
@@ -75,11 +76,7 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize({:dict, pairs}) when is_list(pairs) do
-    """
-    <<
-    #{serialize_dictionary_pairs(pairs)}
-    >>
-    """
+    "<<#{serialize_dictionary_pairs(pairs)}>>"
   end
 
   def serialize({:stream, {:dict, options}, payload}) when is_binary(payload) do
@@ -118,7 +115,7 @@ defmodule Gutenex.PDF.Serialization do
   def serialize_dictionary_pairs(pairs) do
     Enum.reject(pairs, fn ({_key, value}) -> value == nil end)
     |> Enum.map(&serialize_dictionary_pair/1)
-    |> Enum.join "\n"
+    |> Enum.join()
   end
 
   def serialize_dictionary_pair({key, value}) do

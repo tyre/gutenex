@@ -44,7 +44,6 @@ defmodule GutenexTest do
 # The 'xref' keyword was not found or the xref table is malformed.
 # The file trailer dictionary is missing or invalid.
 # The "endobj" keyword is missing.
-# The comment, classifying the file as containing 8-bit binary data, is missing.
 # The file trailer dictionary must have an id key.
 # The key Metadata is required but missing.
 # The documents contains no pages.
@@ -55,13 +54,12 @@ defmodule GutenexTest do
 # Done.
 
   test "integration!" do
-    File.rm("./alpaca.pdf")
+    File.rm("./tmp/alpaca.pdf")
     image = %Imagineer.Image{alias: "Alpaca", uri: "./test/support/images/alpaca.png"}
       |> Imagineer.Image.load()
       |> Imagineer.Image.process()
-    context = %Gutenex.PDF.Context{images: [image]}
-    Apex.ap "Writing!"
-    File.write "./alpaca.pdf", Gutenex.PDF.Builder.build(context)
+    {context, _stream} = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, "Walrus")
+    File.write "./tmp/alpaca.pdf", Gutenex.PDF.Builder.build(context)
     |> Gutenex.PDF.Exporter.export()
   end
 end
