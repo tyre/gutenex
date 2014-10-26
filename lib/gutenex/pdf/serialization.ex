@@ -45,7 +45,6 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize({:ptr, object_number, generation_number}) do
-    Apex.ap(["serializing a pointer!", object_number, generation_number])
     " #{object_number} #{generation_number} R "
   end
 
@@ -75,18 +74,20 @@ defmodule Gutenex.PDF.Serialization do
     " [" <> inner <> "] "
   end
 
+  def serialize({:rect, elements}) do
+    inner = Enum.map(elements, &serialize/1)
+    |> Enum.join " "
+    " [" <> inner <> "] "
+  end
+
   def serialize({:dict, pairs}) when is_list(pairs) do
-    "<<#{serialize_dictionary_pairs(pairs)}>>\n"
+    "<<#{serialize_dictionary_pairs(pairs)}>>"
   end
 
   def serialize({:stream, {:dict, options}, payload}) when is_binary(payload) do
     {options, payload} = prepare_stream(options, payload)
-    serialize({:dict, options}) <>
-    """
-    stream
-    #{payload}
-    endstream
-    """
+    serialize({:dict, options}) <> "\n" <>
+    Enum.join(["stream", payload, "endstream"], "\n")
   end
 
   def serialize({:stream, payload}) when is_binary(payload) do

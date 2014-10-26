@@ -16,7 +16,6 @@ defmodule Gutenex.PDF.Builder do
     meta_data = {{:obj, meta_data_index, 0}, build_meta_data(context)}
 
     all_objects = image_objects ++ [page_tree | page_objects] ++ [catalog, meta_data]
-    Apex.ap(inspect(all_objects))
     {catalog_root_index, meta_data_index, all_objects}
   end
 
@@ -54,7 +53,7 @@ defmodule Gutenex.PDF.Builder do
     {:dict, [
       {"Type", {:name, "Pages"}},
       {"Count", length(page_references)},
-      {"MediaBox", {:array, media_box(context.media_box)}},
+      {"MediaBox", {:rect, media_box(context.media_box)}},
       {"Kids", {:array, page_pointers(page_references)}},
       {"Resources", page_resources(context, image_objects)}
     ]}
@@ -91,17 +90,7 @@ defmodule Gutenex.PDF.Builder do
   def page_resources(context, image_objects) do
     {:dict, [
       {"Font", {:array, context.fonts }},
-      {"XObject", image_objects },
-      # TODO: What are procsets? Do I need to add some for images?
-      {"ProcSet",
-        {:array,
-          [
-            {:name, "PDF"},
-            {:name, "Text"},
-            {:name, "ImageC"}
-          ]
-        }
-      }
+      {"XObject", image_objects }
     ]}
   end
 
