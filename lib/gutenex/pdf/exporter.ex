@@ -3,7 +3,6 @@ defmodule Gutenex.PDF.Exporter do
   # Declare the PDF version and a magic comment to imply binary data
   @start_mark """
   %PDF-1.4
-  %‚„œ”
   """
   @end_mark "%%EOF\r\n"
 
@@ -21,11 +20,10 @@ defmodule Gutenex.PDF.Exporter do
   def trailer(root_index, meta_data_index, objects) do
     """
     trailer
-    <<
-    /Size #{length(objects) + 1} 0 R
-    /Root #{root_index} 0 R
-    /Info #{meta_data_index} 0 R
-    >>
+      << /Size #{length(objects) + 1}
+        /Root #{root_index} 0 R
+        /Info #{meta_data_index} 0 R
+      >>
     """
   end
 

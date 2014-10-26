@@ -58,7 +58,7 @@ defmodule GutenexTest do
     image = %Imagineer.Image{alias: "Alpaca", uri: "./test/support/images/alpaca.png"}
       |> Imagineer.Image.load()
       |> Imagineer.Image.process()
-    context = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, "Walrus")
+    context = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, "BT\n[ (A) 120 (W) 120 (A) 95 (Y again) ] TJ\nET")
     File.write "./tmp/alpaca.pdf", Gutenex.PDF.Builder.build(context)
     |> Gutenex.PDF.Exporter.export()
   end
