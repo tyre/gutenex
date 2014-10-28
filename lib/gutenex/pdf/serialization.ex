@@ -84,6 +84,10 @@ defmodule Gutenex.PDF.Serialization do
     "<<#{serialize_dictionary_pairs(pairs)}>>"
   end
 
+  def serialize({:dict, map}) when is_map(map) do
+    serialize({:dict, Map.to_list(map)})
+  end
+
   def serialize({:stream, {:dict, options}, payload}) when is_binary(payload) do
     {options, payload} = prepare_stream(options, payload)
     serialize({:dict, options}) <> "\n" <>

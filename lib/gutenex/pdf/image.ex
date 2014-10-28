@@ -29,42 +29,41 @@ defmodule Gutenex.PDF.Image do
   end
 
   def extras(%Image{format: :png, attributes: %{ color_type: 2 }}=image) do
-    extra_attributes = [
-      {"Filter", {:name, "FlateDecode"}},
-      {"BitsPerComponent", image.bit_depth},
-      {"DecodeParms", decode_params(image)},
-      {"ColorSpace", {:name, png_color(image.attributes.color_type)}}
-    ]
+    extra_attributes = %{
+      "Filter"            => {:name, "FlateDecode"},
+      "ColorSpace"        => {:name, png_color(image.attributes.color_type)},
+      "DecodeParms"       => decode_params(image),
+      "BitsPerComponent"  => image.bit_depth
+    }
     { extra_attributes, []}
   end
 
   defp image_attributes(image, extra_attributes) do
     {:dict,
-      [
-        {"Type", {:name, "XObject"}},
-        {"Subtype",{:name, "Image"}},
-        {"Width", image.width},
-        {"Height", image.height} |
-        extra_attributes
-      ]
+      Map.merge(%{
+        "Type"    => {:name, "XObject"},
+        "Width"   => image.width,
+        "Height"  => image.height,   
+        "Subtype" => {:name, "Image"}
+      }, extra_attributes)
     }
   end
 
   defp decode_params(image) do
     {
       :dict,
-      [
-        {"Predictor", 15},
-        {"Colors", png_bits(image.attributes.color_type)},
-        {"BitsPerComponent", image.bit_depth},
-        {"Columns", image.width}
-      ]
+      %{
+        "Colors"            => png_bits(image.attributes.color_type),
+        "Columns"           => image.width,
+        "Predictor"         => 15,
+        "BitsPerComponent"  => image.bit_depth
+      }
     }
   end
 
 
   def images_summary(images) do
-    images_summary(images, 1, [], [])
+    images_summary(images, 1, %{}, [])
   end
 
   def images_summary([], total_object_count, image_aliases, x_objects) do
@@ -87,7 +86,7 @@ defmodule Gutenex.PDF.Image do
       {total_object_count, [x_object, extra_objects]} ->
         {total_object_count, [x_object, extra_objects | x_objects]}
     end
-    image_aliases = [{"Img#{existing_object_count}", existing_object_count} | image_aliases]
+    image_aliases = Map.put image_aliases, "Img#{existing_object_count}", existing_object_count
     images_summary(images_tail, total_object_count + 1, image_aliases, x_objects)
   end
 

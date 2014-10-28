@@ -36,6 +36,7 @@ defmodule Gutenex do
   """
   def context(pid, new_context) do
     GenServer.cast(pid, {:context, new_context})
+    pid
   end
 
   @doc """
@@ -43,6 +44,7 @@ defmodule Gutenex do
   """
   def set_page(pid, page) when is_integer(page) do
     GenServer.cast(pid, {:context, :put, {:current_page, page}})
+    pid
   end
 
 
@@ -58,6 +60,7 @@ defmodule Gutenex do
   """
   def append_to_stream(pid, content) do
     GenServer.cast(pid, {:stream, :append, content})
+    pid
   end
 
   @doc """

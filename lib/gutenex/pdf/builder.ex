@@ -1,22 +1,40 @@
 defmodule Gutenex.PDF.Builder do
   alias Gutenex.PDF.Context
-#   %% L = [int()] = list of objects representing pages
-
 
   def build(%Context{} = context) do
     {current_index, image_references, image_objects} =
       Gutenex.PDF.Image.images_summary(context.images)
-    page_root_index = current_index
-    {current_index, page_references, page_objects} = build_pages(context, page_root_index)
+    {page_root_index, font_references, font_objects} = build_fonts(current_index, context.fonts)
+    {catalog_root_index, page_references, page_objects} = build_pages(context, page_root_index)
     page_tree = {{:obj, page_root_index, 0},
-                  build_page_tree(context, page_references, image_references)}
-    catalog_root_index = current_index
+                  build_page_tree(context, page_references, image_references, font_references)}
+    
     catalog = {{:obj, catalog_root_index, 0}, build_catalog(page_root_index)}
+    
     meta_data_index = catalog_root_index + 1
     meta_data = {{:obj, meta_data_index, 0}, build_meta_data(context)}
 
-    all_objects = image_objects ++ [page_tree | page_objects] ++ [catalog, meta_data]
+    all_objects = image_objects ++ font_objects ++ [page_tree | page_objects] ++ 
+                  [catalog, meta_data]
     {catalog_root_index, meta_data_index, all_objects}
+  end
+
+  # Builds each font object, returning the last object index, the reference
+  # dictionary (for each font, "FontReference" => {:ptr, font_index, 0})
+  # and the font objects themselves
+  def build_fonts(current_index, fonts) do
+    build_fonts(current_index, Map.to_list(fonts), %{}, [])
+  end
+
+  def build_fonts(current_index, [], font_references, font_objects) do
+    {current_index, font_references, Enum.reverse(font_objects)}
+  end
+
+  def build_fonts(current_index, [{font_alias, font_definition}|rest_of_fonts]=fonts, font_references, font_objects) do
+    font_objects = [{{:obj, current_index, 0}, {:dict, font_definition}} | font_objects]
+    font_references = Map.put font_references, font_alias, {:ptr, current_index, 0}
+    next_index = current_index + 1
+    build_fonts(next_index, rest_of_fonts, font_references, font_objects)
   end
 
   # Pages are built into two objects
@@ -43,20 +61,23 @@ defmodule Gutenex.PDF.Builder do
   end
 
   defp page_summary(root_index, current_index, contents_reference) do
-    {{:obj, current_index, 0}, {:dict, [
-      {"Type", {:name, "Page"}},
-      {"Parent", {:ptr, root_index, 0}},
-      {"Contents", {:ptr, contents_reference, 0}}]}}
+    {
+      {:obj, current_index, 0},
+      {:dict, %{
+        "Type" => {:name, "Page"},
+        "Parent" => {:ptr, root_index, 0},
+        "Contents" => {:ptr, contents_reference, 0}
+      }}
+    }
   end
 
-  def build_page_tree(%Context{} = context, page_references, image_objects) do
-    {:dict, [
-      {"Type", {:name, "Pages"}},
-      {"Count", length(page_references)},
-      {"MediaBox", {:rect, media_box(context.media_box)}},
-      {"Kids", {:array, page_pointers(page_references)}},
-      {"Resources", page_resources(context, image_objects)}
-    ]}
+  def build_page_tree(%Context{} = context, page_references, image_references, font_references) do
+    {:dict, %{ 
+      "Type" => {:name, "Pages"},
+      "Count" => length(page_references),
+      "MediaBox" => {:rect, media_box(context.media_box)},
+      "Kids" => {:array, page_pointers(page_references)},
+      "Resources" => page_resources(image_references, font_references)}}
   end
 
   def build_catalog(page_tree_reference) do
@@ -66,15 +87,15 @@ defmodule Gutenex.PDF.Builder do
   end
 
   def build_meta_data(%Context{} = context) do
-    {:dict, [
-      {"Title", {:string, context.meta_data.title}},
-      {"Author", {:string, context.meta_data.author}},
-      {"Creator", {:string, context.meta_data.creator}},
-      {"Subject", {:string, context.meta_data.subject}},
-      {"Producer", {:string, context.meta_data.producer}},
-      {"Keywords", {:string, context.meta_data.keywords}},
-      {"CreationDate", {:date, context.meta_data.creation_date}}
-    ]}
+    {:dict, %{
+      "Title" => {:string, context.meta_data.title},
+      "Author" => {:string, context.meta_data.author},
+      "Creator" => {:string, context.meta_data.creator},
+      "Subject" => {:string, context.meta_data.subject},
+      "Producer" => {:string, context.meta_data.producer},
+      "Keywords" => {:string, context.meta_data.keywords},
+      "CreationDate" => {:date, context.meta_data.creation_date}
+    }}
   end
 
   def media_box({top_left, top_right, bottom_left, bottom_right}) do
@@ -86,24 +107,12 @@ defmodule Gutenex.PDF.Builder do
       { :ptr, page_reference, 0 }
     end
   end
+  
 
-  def page_resources(context, image_objects) do
-    {:dict, [
-      {"Font", {:array, context.fonts }},
-      {"XObject", image_objects }
-    ]}
+  def page_resources(image_references, font_references) do
+    {:dict, %{
+      "Font" => {:dict, font_references },
+      "XObject" => image_references
+    }}
   end
-
-#   mk_pages([], _, N, P, O) -> {N, lists:reverse(P), lists:reverse(O)};
-# mk_pages([{page,Str}|T], Parent, I, L, E) ->
-#     O1 = {{obj,I,0},mkPageContents(Str)},
-#     O2 = {{obj,I+1,0},mkPage( Parent, I)},
-#     mk_pages(T, Parent, I+2, [I+1|L], [O2,O1|E]);
-# mk_pages([{page,Str,Script}|T], Parent, I, L, E) ->
-#     O1 = {{obj,I,0},mkPageContents(Str)},
-#     O2 = {{obj,I+1,0},mkScript(Script)},
-#     O3 = {{obj,I+2,0},mkPage( Parent, I, I+1)},
-#     mk_pages(T, Parent, I+3, [I+2|L], [O3,O2,O1|E]).
-
-
 end

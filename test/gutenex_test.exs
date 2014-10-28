@@ -39,26 +39,19 @@ defmodule GutenexTest do
     assert %Gutenex.PDF.Context{current_page: 2} == Gutenex.context(server)
   end
 
-# Existing errors!
-# Validating file "alpaca.pdf" for conformance level pdfa-1b
-# The 'xref' keyword was not found or the xref table is malformed.
-# The file trailer dictionary is missing or invalid.
-# The "endobj" keyword is missing.
-# The file trailer dictionary must have an id key.
-# The key Metadata is required but missing.
-# The documents contains no pages.
-# The document does not conform to the requested standard.
-# The file format (header, trailer, objects, xref, streams) is corrupted.
-# The document doesn't conform to the PDF reference (missing required entries, wrong value types, etc.).
-# The document's meta data is either missing or inconsistent or corrupt.
-# Done.
 
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
-    image = %Imagineer.Image{alias: "Alpaca", uri: "./test/support/images/alpaca.png"}
-      |> Imagineer.Image.load()
-      |> Imagineer.Image.process()
-    context = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, "BT\n[ (A) 120 (W) 120 (A) 95 (Y again) ] TJ\nET")
+    text = """
+    BT
+      /Helvetica 48 Tf
+      20 40 Td
+      0 Tr
+      0.5 g
+      (ABC) Tj
+    ET
+    """
+    context = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, text)
     File.write "./tmp/alpaca.pdf", Gutenex.PDF.Builder.build(context)
     |> Gutenex.PDF.Exporter.export()
   end

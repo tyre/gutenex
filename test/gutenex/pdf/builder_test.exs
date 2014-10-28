@@ -21,15 +21,18 @@ defmodule Gutenex.PDF.BuilderTest do
     [page_1_contents, page_1_summary, page_2_contents, page_2_summary] = page_objects
 
     assert page_1_contents == {{:obj, 58, 0}, {:stream, page_1}}
-    assert page_1_summary  == {{:obj, 59, 0}, {:dict, [
-                            {"Type", {:name, "Page"}}, {"Parent", {:ptr, 57, 0}},
-                            {"Contents", {:ptr, 58, 0}}]}}
+    assert page_1_summary  == {
+      {:obj, 59, 0}, {:dict, %{
+                              "Type" => {:name, "Page"}, 
+                              "Parent" => {:ptr, 57, 0},
+                              "Contents" => {:ptr, 58, 0}}}}
 
     assert page_2_contents  == {{:obj, 60, 0}, {:stream, page_2}}
-    assert page_2_summary   == {{:obj, 61, 0}, {:dict, [
-                                {"Type", {:name, "Page"}},
-                                {"Parent", {:ptr, 57, 0}},
-                                {"Contents", {:ptr, 60, 0}}]}}
+    assert page_2_summary   == {
+      {:obj, 61, 0}, {:dict, %{
+                                "Type" => {:name, "Page"},
+                                "Parent" => {:ptr, 57, 0},
+                                "Contents" => {:ptr, 60, 0}}}}
 
   end
 
@@ -46,13 +49,13 @@ defmodule Gutenex.PDF.BuilderTest do
   end
 
   test "#page_resources builds a dictionary of fonts and image objects" do
-    context = %Context{ fonts: [:bingo, :bango, :bongo] }
-    image_objects = [{:array, [1,2,3]}, {:ptr, 1, 0}]
-    assert Builder.page_resources(context, image_objects) == {
-      :dict, [
-        {"Font", {:array, context.fonts} },
-        {"XObject", image_objects }
-      ]
+    font_references = %{"Helvetica" => {:ptr, 31, 0}, "Times-Roman" => {:ptr, 28, 0}}
+    image_references = [{:array, [1,2,3]}, {:ptr, 1, 0}]
+    assert Builder.page_resources(image_references, font_references) == {
+      :dict, %{
+        "Font" => {:dict, font_references},
+        "XObject" => image_references
+      }
     }
   end
 
@@ -60,18 +63,19 @@ defmodule Gutenex.PDF.BuilderTest do
     # Set up the test context and variables
     context = %Context{media_box: Page.page_size(:a0)}
     page_references = [4, 8, 15, 16, 23, 42]
-    image_objects = [{:stream, "of images!"}]
+    font_references = %{"Helvetica" => {:ptr, 31, 0}, "Times-Roman" => {:ptr, 28, 0}}
+    image_references = [{:array, [1,2,3]}, {:ptr, 1, 0}]
 
-    {:dict, page_tree } = Builder.build_page_tree(context, page_references, image_objects)
+    {:dict, page_tree } = Builder.build_page_tree(context, page_references, image_references, font_references)
 
-    assert List.keyfind(page_tree, "Type", 0)      == {"Type", {:name, "Pages"}}
-    assert List.keyfind(page_tree, "Kids", 0)      ==
-           {"Kids", {:array, [{:ptr, 4, 0}, {:ptr, 8, 0}, {:ptr, 15, 0},
-                              {:ptr, 16, 0}, {:ptr, 23, 0}, {:ptr, 42, 0}]}}
-    assert List.keyfind(page_tree, "Count", 0)     == {"Count", 6}
-    assert List.keyfind(page_tree, "MediaBox", 0)  == {"MediaBox", {:rect, [0, 0, 2380, 3368]}}
-    assert List.keyfind(page_tree, "Resources", 0) == {"Resources",
-           {:dict, [{"Font", {:array, context.fonts}}, {"XObject", image_objects }]}}
+    assert Map.get(page_tree, "Type")      == {:name, "Pages"}
+    assert Map.get(page_tree, "Kids")      == {:array, 
+      [{:ptr, 4, 0}, {:ptr, 8, 0}, {:ptr, 15, 0}, {:ptr, 16, 0}, {:ptr, 23, 0},
+       {:ptr, 42, 0}]}
+    assert Map.get(page_tree, "Count")     == 6
+    assert Map.get(page_tree, "MediaBox")  == {:rect, [0, 0, 2380, 3368]}
+    assert Map.get(page_tree, "Resources") == {:dict, 
+      %{"Font" => {:dict, font_references}, "XObject" => image_references }}
   end
 
   test "#build_catalog" do
@@ -93,12 +97,31 @@ defmodule Gutenex.PDF.BuilderTest do
       }
     }
     {:dict, meta_data} = Builder.build_meta_data(context)
-    assert List.keyfind(meta_data, "Title", 0)        ==  {"Title", {:string, context.meta_data.title}}
-    assert List.keyfind(meta_data, "Author", 0)       ==  {"Author", {:string, context.meta_data.author}}
-    assert List.keyfind(meta_data, "Creator", 0)      ==  {"Creator", {:string, context.meta_data.creator}}
-    assert List.keyfind(meta_data, "Subject", 0)      ==  {"Subject", {:string, context.meta_data.subject}}
-    assert List.keyfind(meta_data, "Producer", 0)     ==  {"Producer", {:string, context.meta_data.producer}}
-    assert List.keyfind(meta_data, "Keywords", 0)     ==  {"Keywords", {:string, context.meta_data.keywords}}
-    assert List.keyfind(meta_data, "CreationDate", 0) ==  {"CreationDate", {:date, context.meta_data.creation_date}}
+    assert Map.get(meta_data, "Title")        ==  {:string, context.meta_data.title}
+    assert Map.get(meta_data, "Author")       ==  {:string, context.meta_data.author}
+    assert Map.get(meta_data, "Creator")      ==  {:string, context.meta_data.creator}
+    assert Map.get(meta_data, "Subject")      ==  {:string, context.meta_data.subject}
+    assert Map.get(meta_data, "Producer")     ==  {:string, context.meta_data.producer}
+    assert Map.get(meta_data, "Keywords")     ==  {:string, context.meta_data.keywords}
+    assert Map.get(meta_data, "CreationDate") ==  {:date, context.meta_data.creation_date}
+  end
+
+  test "#build_fonts" do
+    font_1 = %{"Name" => "Abra",    "Subtype" => "Type1", "Type" => "Font"}
+    font_2 = %{"Name" => "Barbara", "Subtype" => "Type1", "Type" => "Font"}
+    font_3 = %{"Name" => "Cabana",  "Subtype" => "Type1", "Type" => "Font"}
+    fonts = %{"Abra" => font_1, "Barbara" => font_2, "Cabana" => font_3}
+    {next_index, font_references, font_objects} = Builder.build_fonts(2, fonts)
+    assert next_index == 5, "it returns the next index"
+    assert font_references == %{
+      "Abra" => {:ptr, 2, 0},
+      "Barbara" => {:ptr, 3, 0},
+      "Cabana" => {:ptr, 4, 0}
+    }
+    assert font_objects == [
+      {{:obj, 2, 0}, {:dict, font_1}},
+      {{:obj, 3, 0}, {:dict, font_2}},
+      {{:obj, 4, 0}, {:dict, font_3}}
+    ]
   end
 end
