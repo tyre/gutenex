@@ -81,9 +81,9 @@ defmodule Gutenex.PDF.Builder do
   end
 
   def build_catalog(page_tree_reference) do
-    {:dict,[
-     {"Type", {:name, "Catalog"}},
-     {"Pages", {:ptr, page_tree_reference, 0}}]}
+    {:dict, %{
+      "Type" => {:name, "Catalog"},
+      "Pages" => {:ptr, page_tree_reference, 0}}}
   end
 
   def build_meta_data(%Context{} = context) do
@@ -104,7 +104,7 @@ defmodule Gutenex.PDF.Builder do
 
   def page_pointers(page_references) do
     Enum.map page_references, fn(page_reference) ->
-      { :ptr, page_reference, 0 }
+      {:ptr, page_reference, 0}
     end
   end
   

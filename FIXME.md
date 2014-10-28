@@ -1,1 +1,1 @@
-Move all `{:dict, [{"Key", "Value"}]}` to be `{:dict, %{"Key" => "Value"}}`
+Don't include every basic font object by default, only as used

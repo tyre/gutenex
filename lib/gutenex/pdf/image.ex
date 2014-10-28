@@ -91,8 +91,8 @@ defmodule Gutenex.PDF.Image do
   end
 
   defp image_aliases_objects(images) do
-    Enum.map images, fn ({aliass, image_index}) ->
-      { aliass, {:ptr, image_index, 0}}
+    Enum.reduce images, %{}, fn ({aliass, image_index}, aliases) ->
+      Map.put aliases, aliass, {:ptr, image_index, 0}
     end
   end
 

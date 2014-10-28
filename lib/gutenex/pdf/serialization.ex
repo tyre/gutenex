@@ -80,12 +80,8 @@ defmodule Gutenex.PDF.Serialization do
     " [" <> inner <> "] "
   end
 
-  def serialize({:dict, pairs}) when is_list(pairs) do
-    "<<#{serialize_dictionary_pairs(pairs)}>>"
-  end
-
   def serialize({:dict, map}) when is_map(map) do
-    serialize({:dict, Map.to_list(map)})
+    "<<#{serialize_dictionary_pairs(map)}>>"
   end
 
   def serialize({:stream, {:dict, options}, payload}) when is_binary(payload) do
@@ -95,7 +91,7 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize({:stream, payload}) when is_binary(payload) do
-    serialize({:stream, {:dict, []}, payload})
+    serialize({:stream, {:dict, %{}}, payload})
   end
 
   def serialize(untyped) when is_binary(untyped) do
@@ -109,16 +105,12 @@ defmodule Gutenex.PDF.Serialization do
   # TODO: Implement filters defined on page PDF 42 of
   # http://partners.adobe.com/public/developer/en/pdf/PDFReference.pdf
   defp prepare_stream(options, payload) do
-    options = put_in_dict(options, "Length", String.length(payload))
+    options = Map.put(options, "Length", String.length(payload))
     {options, payload}
   end
 
-  defp put_in_dict(dict, key, value) do
-      List.keystore dict, key, 0, {key, value}
-  end
-
-  def serialize_dictionary_pairs(pairs) do
-    Enum.reject(pairs, fn ({_key, value}) -> value == nil end)
+  def serialize_dictionary_pairs(map) do
+    Enum.reject(map, fn ({_key, value}) -> value == nil end)
     |> Enum.map(&serialize_dictionary_pair/1)
     |> Enum.join()
   end

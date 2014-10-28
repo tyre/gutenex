@@ -79,9 +79,9 @@ defmodule Gutenex.PDF.BuilderTest do
   end
 
   test "#build_catalog" do
-    assert Builder.build_catalog(99) == {:dict,[
-           {"Type", {:name, "Catalog"}},
-           {"Pages", {:ptr, 99, 0}}]}
+    assert Builder.build_catalog(99) == {:dict, %{
+           "Type"  => {:name, "Catalog"},
+           "Pages" => {:ptr, 99, 0}}}
   end
 
   test "#build_meta_data" do

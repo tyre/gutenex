@@ -43,11 +43,6 @@ defmodule Gutenex.PDF.SerializationTest do
            " [1, (Two) ,3.00, (D:17760704000000) ] "
   end
 
-  test "#serialize with a :dict using tuples" do
-    assert Serialization.serialize({:dict, [{"Key", "Value"}, {"Numbers", {:array, [1, 2, 3]}}, {"Nope", nil}]}) ==
-    "<</Key (Value)/Numbers [1,2,3]>>"
-  end
-
   test "#serialize with a :dict using a map" do
     assert Serialization.serialize({:dict, %{"Key" => "Value", "Numbers" => {:array, [1, 2, 3]}, "Nope" => nil}}) ==
     "<</Key (Value)/Numbers [1,2,3]>>"

@@ -49,6 +49,9 @@ defmodule GutenexTest do
       0 Tr
       0.5 g
       (ABC) Tj
+      /Courier 32 Tf
+      90 Tr
+      (xyz) Tj
     ET
     """
     context = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, text)

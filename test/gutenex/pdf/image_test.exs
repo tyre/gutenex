@@ -15,12 +15,12 @@ defmodule Gutenex.PDF.ImageTest do
 
   test "#images_summary with no images" do
     assert Gutenex.PDF.Image.images_summary([]) ==
-      {2, {:ptr, 1, 0}, [{{:obj, 1, 0}, {:dict, []}}]}
+      {2, {:ptr, 1, 0}, [{{:obj, 1, 0}, {:dict, %{}}}]}
   end
 
   test "#images_summary with one image", %{image: image, x_object: x_object} do
     {_obj_count, [raw_x_object, []]} = x_object
     assert Gutenex.PDF.Image.images_summary([image]) ==
-      {3, {:ptr, 2, 0}, [raw_x_object, {{:obj, 2, 0}, {:dict, [{"Img1", {:ptr, 1, 0}}]}}]}
+      {3, {:ptr, 2, 0}, [raw_x_object, {{:obj, 2, 0}, {:dict, %{"Img1" => {:ptr, 1, 0}}}}]}
   end
 end
