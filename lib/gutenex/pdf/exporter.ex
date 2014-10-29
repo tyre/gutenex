@@ -6,23 +6,23 @@ defmodule Gutenex.PDF.Exporter do
   """
   @end_mark "%%EOF\r\n"
 
-  def export({root_index, meta_data_index, objects}) do
+  def export({root_index, generation_number, meta_data_index, objects}) do
     serialized_objects =
       Enum.map(objects, &Gutenex.PDF.Serialization.serialize/1)
     @start_mark <>
     Enum.join(serialized_objects) <>
     cross_reference_table(serialized_objects) <>
-    trailer(root_index, meta_data_index, objects) <>
+    trailer(root_index, generation_number, meta_data_index, objects) <>
     start_cross_reference(serialized_objects) <>
     @end_mark
   end
 
-  def trailer(root_index, meta_data_index, objects) do
+  def trailer(root_index, generation_number, meta_data_index, objects) do
     """
     trailer
       << /Size #{length(objects) + 1}
-        /Root #{root_index} 0 R
-        /Info #{meta_data_index} 0 R
+        /Root #{root_index} #{generation_number} R
+        /Info #{meta_data_index} #{generation_number} R
       >>
     """
   end

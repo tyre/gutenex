@@ -37,14 +37,14 @@ defmodule Gutenex.PDF.BuilderTest do
   end
 
   test "#page_pointers returns a pointer for each page reference" do
-    assert Builder.page_pointers([4, 8, 15, 16, 23, 42]) ==
+    assert Builder.page_pointers([4, 8, 15, 16, 23, 42], 15) ==
            [
-            {:ptr, 4, 0},
-            {:ptr, 8, 0},
-            {:ptr, 15, 0},
-            {:ptr, 16, 0},
-            {:ptr, 23, 0},
-            {:ptr, 42, 0}
+            {:ptr, 4, 15},
+            {:ptr, 8, 15},
+            {:ptr, 15, 15},
+            {:ptr, 16, 15},
+            {:ptr, 23, 15},
+            {:ptr, 42, 15}
            ]
   end
 
@@ -79,9 +79,9 @@ defmodule Gutenex.PDF.BuilderTest do
   end
 
   test "#build_catalog" do
-    assert Builder.build_catalog(99) == {:dict, %{
+    assert Builder.build_catalog(99, 7) == {:dict, %{
            "Type"  => {:name, "Catalog"},
-           "Pages" => {:ptr, 99, 0}}}
+           "Pages" => {:ptr, 99, 7}}}
   end
 
   test "#build_meta_data" do
@@ -111,17 +111,17 @@ defmodule Gutenex.PDF.BuilderTest do
     font_2 = %{"Name" => "Barbara", "Subtype" => "Type1", "Type" => "Font"}
     font_3 = %{"Name" => "Cabana",  "Subtype" => "Type1", "Type" => "Font"}
     fonts = %{"Abra" => font_1, "Barbara" => font_2, "Cabana" => font_3}
-    {next_index, font_references, font_objects} = Builder.build_fonts(2, fonts)
-    assert next_index == 5, "it returns the next index"
+    {next_index, font_references, font_objects} = Builder.build_fonts(100, 47, fonts)
+    assert next_index == 103, "it returns the next index"
     assert font_references == %{
-      "Abra" => {:ptr, 2, 0},
-      "Barbara" => {:ptr, 3, 0},
-      "Cabana" => {:ptr, 4, 0}
+      "Abra" => {:ptr, 100, 47},
+      "Barbara" => {:ptr, 101, 47},
+      "Cabana" => {:ptr, 102, 47}
     }
     assert font_objects == [
-      {{:obj, 2, 0}, {:dict, font_1}},
-      {{:obj, 3, 0}, {:dict, font_2}},
-      {{:obj, 4, 0}, {:dict, font_3}}
+      {{:obj, 100, 47}, {:dict, font_1}},
+      {{:obj, 101, 47}, {:dict, font_2}},
+      {{:obj, 102, 47}, {:dict, font_3}}
     ]
   end
 end

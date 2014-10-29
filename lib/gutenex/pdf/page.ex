@@ -1,13 +1,13 @@
 defmodule Gutenex.PDF.Page do
   use Gutenex.PDF.Page.PageSizes
 
-  def to_pdf(parent_reference, contents_reference, options \\ %{}) do
+  def to_pdf( parent_reference, contents_reference, generation_number, options \\ %{}) do
     {
       :dict,
       [
         {"Type", {:name, "Page"}},
-        {"Parent", {:ptr, parent_reference, 0}},
-        {"Contents", {:ptr, contents_reference, 0}} |
+        {"Parent", {:ptr, parent_reference, generation_number}},
+        {"Contents", {:ptr, contents_reference, generation_number}} |
         Enum.map(options, &page_option(&1))
       ]
     }

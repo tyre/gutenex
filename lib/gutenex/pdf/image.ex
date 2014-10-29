@@ -1,11 +1,11 @@
 defmodule Gutenex.PDF.Image do
   alias Imagineer.Image
   # process a png into x_object
-  def to_x_object(%Image{format: :png}=image) do
-    to_x_object(image, 1)
+  def to_x_object(%Image{format: :png}=image, object_number, object_generation_number) do
+    to_x_object(image, {object_number, object_generation_number})
   end
 
-  defp to_x_object(image, object_index) when is_integer(object_index) do
+  defp to_x_object(image, {object_index, object_generation_number}) when is_integer(object_index) do
     {extra_attributes, extra_object} = extras(image)
     # total_object_count is object_index + 1 if there is an extra object
     total_object_count = if extra_object == [] do
@@ -17,7 +17,7 @@ defmodule Gutenex.PDF.Image do
       object_index,
       [
         {
-          {:obj, total_object_count, 0},
+          {:obj, total_object_count, object_generation_number},
           {:stream,
             image_attributes(image, extra_attributes),
             image.content
@@ -62,37 +62,37 @@ defmodule Gutenex.PDF.Image do
   end
 
 
-  def images_summary(images) do
-    images_summary(images, 1, %{}, [])
+  def images_summary(images, object_index, object_generation_number) do
+    images_summary(images, {object_index, object_generation_number}, %{}, [])
   end
 
-  def images_summary([], total_object_count, image_aliases, x_objects) do
-    aliases = image_aliases_objects(image_aliases)
+  def images_summary([], {object_index, object_generation_number}, image_aliases, x_objects) do
+    aliases = image_aliases_objects(image_aliases, object_generation_number)
     summary = {
-      {:obj, total_object_count, 0},
+      {:obj, object_index, object_generation_number},
       {:dict, aliases}
     }
     {
-      total_object_count + 1,
-      {:ptr, total_object_count, 0},
+      object_index + 1,
+      {:ptr, object_index, object_generation_number},
       Enum.reverse([summary|x_objects])
     }
   end
 
-  def images_summary([current_image | images_tail], existing_object_count, image_aliases, x_objects) do
-    {total_object_count, x_objects} = case to_x_object(current_image, existing_object_count) do
-      {total_object_count, [x_object, []]} ->
-        {total_object_count, [x_object | x_objects]}
-      {total_object_count, [x_object, extra_objects]} ->
-        {total_object_count, [x_object, extra_objects | x_objects]}
+  def images_summary([current_image | images_tail], {object_index, object_generation_number}, image_aliases, x_objects) do
+    {next_object_index, x_objects} = case to_x_object(current_image, {object_index, object_generation_number}) do
+      {next_object_index, [x_object, []]} ->
+        {next_object_index, [x_object | x_objects]}
+      {next_object_index, [x_object, extra_objects]} ->
+        {next_object_index, [x_object, extra_objects | x_objects]}
     end
-    image_aliases = Map.put image_aliases, "Img#{existing_object_count}", existing_object_count
-    images_summary(images_tail, total_object_count + 1, image_aliases, x_objects)
+    image_aliases = Map.put image_aliases, "Img#{object_index}", object_index
+    images_summary(images_tail, {next_object_index + 1, object_generation_number}, image_aliases, x_objects)
   end
 
-  defp image_aliases_objects(images) do
+  defp image_aliases_objects(images, object_generation_number) do
     Enum.reduce images, %{}, fn ({aliass, image_index}, aliases) ->
-      Map.put aliases, aliass, {:ptr, image_index, 0}
+      Map.put aliases, aliass, {:ptr, image_index, object_generation_number}
     end
   end
 
