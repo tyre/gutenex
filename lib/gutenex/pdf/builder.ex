@@ -1,86 +1,31 @@
 defmodule Gutenex.PDF.Builder do
   alias Gutenex.PDF.Context
-  alias Gutenex.PDF.Image
+  alias Gutenex.PDF.Builders.ImageBuilder
+  alias Gutenex.PDF.Builders.FontBuilder
+  alias Gutenex.PDF.Builders.PageBuilder
+  alias Gutenex.PDF.Builders.PageTreeBuilder
 
   def build(%Context{} = context) do
-    {current_index, image_references, image_objects} = images_summary(context.images, 1, context.generation_number)
-    {page_root_index, font_references, font_objects} = build_fonts(current_index, context.generation_number, context.fonts)
-    {catalog_root_index, page_references, page_objects} = build_pages(context, page_root_index)
-    page_tree = {{:obj, page_root_index, context.generation_number},
-                  build_page_tree(context, page_references, image_references, font_references)}
-    
+    {next_index, image_references, image_objects} = ImageBuilder.build(context, 1)
+    {page_root_index, font_references, font_objects} = FontBuilder.build(context, next_index)
+    {catalog_root_index, page_references, page_objects} = PageBuilder.build(context, page_root_index)
+    page_tree = PageTreeBuilder.build(context, page_root_index, %{
+      images: image_references,
+      fonts: font_references,
+      pages: page_references
+    })
     catalog = {{:obj, catalog_root_index, context.generation_number},
                 build_catalog(page_root_index, context.generation_number)}
-    
+
     meta_data_index = catalog_root_index + 1
     meta_data = {{:obj, meta_data_index, context.generation_number},
                   build_meta_data(context)}
 
-    all_objects = image_objects ++ font_objects ++ [page_tree | page_objects] ++ 
+    all_objects = image_objects ++ font_objects ++ [page_tree | page_objects] ++
                   [catalog, meta_data]
     {catalog_root_index, context.generation_number, meta_data_index, all_objects}
   end
 
-  # Builds each font object, returning the last object index, the reference
-  # dictionary (for each font, "FontReference" => {:ptr, font_index, font_generation_number})
-  # and the font objects themselves
-  def build_fonts(current_index, generation_number, fonts) do
-    build_fonts({current_index, generation_number}, Map.to_list(fonts), %{}, [])
-  end
-
-  def build_fonts({current_index, _generation_number}, [], font_references, font_objects) do
-    {current_index, font_references, Enum.reverse(font_objects)}
-  end
-
-  def build_fonts({current_index, generation_number}, [{font_alias, font_definition}|rest_of_fonts], font_references, font_objects) do
-    font_objects = [{{:obj, current_index, generation_number}, {:dict, font_definition}} | font_objects]
-    font_references = Map.put font_references, font_alias, {:ptr, current_index, generation_number}
-    next_index = current_index + 1
-    build_fonts({next_index, generation_number}, rest_of_fonts, font_references, font_objects)
-  end
-
-  # Pages are built into two objects
-  # The first contains the stream of the page contents
-  # The second is a dictionary describing the page, a reference to the
-  # page tree, and a reference to the page contents
-  def build_pages(%Context{} = context, root_index) do
-    build_pages({root_index, context.generation_number}, root_index + 1, context.pages, [], [])
-  end
-
-  defp build_pages(_index_and_generation_number, current_index, []=_pages_left_to_build, page_references, built_objects) do
-    {current_index, Enum.reverse(page_references), Enum.reverse(built_objects)}
-  end
-
-  defp build_pages({root_index, generation_number}, current_index, [page|pages_left_to_build], page_references, built_objects) do
-    page_summary_reference = current_index + 1
-    page_contents = {{:obj, current_index, generation_number}, {:stream, page}}
-    page_summary = page_summary({root_index, generation_number}, page_summary_reference, current_index)
-
-    page_references = [page_summary_reference | page_references]
-    built_objects = [page_summary, page_contents | built_objects]
-    # We are adding two objects so next index should be two greater than start
-    build_pages({root_index, generation_number}, current_index + 2, pages_left_to_build, page_references, built_objects)
-  end
-
-  defp page_summary({root_index, generation_number}, current_index, contents_reference) do
-    {
-      {:obj, current_index, generation_number},
-      {:dict, %{
-        "Type" => {:name, "Page"},
-        "Parent" => {:ptr, root_index, generation_number},
-        "Contents" => {:ptr, contents_reference, generation_number}
-      }}
-    }
-  end
-
-  def build_page_tree(%Context{} = context, page_references, image_references, font_references) do
-    {:dict, %{ 
-      "Type" => {:name, "Pages"},
-      "Count" => length(page_references),
-      "MediaBox" => {:rect, media_box(context.media_box)},
-      "Kids" => {:array, page_pointers(page_references, context.generation_number)},
-      "Resources" => page_resources(image_references, font_references)}}
-  end
 
   def build_catalog(page_tree_reference, generation_number) do
     {:dict, %{
@@ -98,117 +43,5 @@ defmodule Gutenex.PDF.Builder do
       "Keywords" => {:string, context.meta_data.keywords},
       "CreationDate" => {:date, context.meta_data.creation_date}
     }}
-  end
-
-  def media_box({top_left, top_right, bottom_left, bottom_right}) do
-    [top_left, top_right, bottom_left, bottom_right]
-  end
-
-  def page_pointers(page_references, generation_number) do
-    Enum.map page_references, fn(page_reference) ->
-      {:ptr, page_reference, generation_number}
-    end
-  end
-  
-
-  def page_resources(image_references, font_references) do
-    {:dict, %{
-      "Font" => {:dict, font_references },
-      "XObject" => image_references
-    }}
-  end
-
-  def image_to_x_object(%Imagineer.Image{format: :png}=image, object_number, object_generation_number) do
-    image_to_x_object(image, {object_number, object_generation_number})
-  end
-
-  defp image_to_x_object(image, {object_index, object_generation_number}) when is_integer(object_index) do
-    {extra_attributes, extra_object} = extras(image)
-    # total_object_count is object_index + 1 if there is an extra object
-    total_object_count = if extra_object == [] do
-      object_index
-    else
-      object_index + 1
-    end
-    {
-      object_index,
-      [
-        {
-          {:obj, total_object_count, object_generation_number},
-          {:stream,
-            image_attributes(image, extra_attributes),
-            image.content
-          }
-        },
-        extra_object
-      ]
-    }
-  end
-
-  def extras(%Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}=image) do
-    extra_attributes = %{
-      "Filter"            => {:name, "FlateDecode"},
-      "ColorSpace"        => {:name, Image.png_color(image.attributes.color_type)},
-      "DecodeParms"       => decode_params(image),
-      "BitsPerComponent"  => image.bit_depth
-    }
-    { extra_attributes, []}
-  end
-
-  defp image_attributes(image, extra_attributes) do
-    {:dict,
-      Map.merge(%{
-        "Type"    => {:name, "XObject"},
-        "Width"   => image.width,
-        "Height"  => image.height,   
-        "Subtype" => {:name, "Image"}
-      }, extra_attributes)
-    }
-  end
-
-  defp decode_params(image) do
-    {
-      :dict,
-      %{
-        "Colors"            => Image.png_bits(image.attributes.color_type),
-        "Columns"           => image.width,
-        "Predictor"         => 15,
-        "BitsPerComponent"  => image.bit_depth
-      }
-    }
-  end
-
-  def images_summary(images, object_index, object_generation_number) do
-    images_summary(images, {object_index, object_generation_number}, %{}, [])
-  end
-
-  def images_summary([], {object_index, object_generation_number}, image_aliases, x_objects) do
-    aliases = image_aliases_objects(image_aliases, object_generation_number)
-    summary = {
-      {:obj, object_index, object_generation_number},
-      {:dict, aliases}
-    }
-    {
-      object_index + 1,
-      {:ptr, object_index, object_generation_number},
-      Enum.reverse([summary|x_objects])
-    }
-  end
-
-  def images_summary([current_image | images_tail], {object_index, object_generation_number}, image_aliases, x_objects) do
-    {next_object_index, x_objects} = case image_to_x_object(current_image, {object_index, object_generation_number}) do
-      {next_object_index, [x_object, []]} ->
-        {next_object_index, [x_object | x_objects]}
-      {next_object_index, [x_object, extra_objects]} ->
-        {next_object_index, [x_object, extra_objects | x_objects]}
-    end
-    image_aliases = Map.put image_aliases, "Img#{object_index}", object_index
-    images_summary(images_tail, {next_object_index + 1, object_generation_number}, image_aliases, x_objects)
-  end
-
-  defp image_aliases_objects(images, object_generation_number) do
-    Enum.reduce images, %{}, fn ({aliass, image_index}, aliases) ->
-      Map.put aliases, aliass, {:ptr, image_index, object_generation_number}
-    end
   end
 end
