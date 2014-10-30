@@ -1,9 +1,9 @@
 defmodule Gutenex.PDF.Builder do
   alias Gutenex.PDF.Context
+  alias Gutenex.PDF.Image
 
   def build(%Context{} = context) do
-    {current_index, image_references, image_objects} =
-      Gutenex.PDF.Image.images_summary(context.images, 1, context.generation_number)
+    {current_index, image_references, image_objects} = images_summary(context.images, 1, context.generation_number)
     {page_root_index, font_references, font_objects} = build_fonts(current_index, context.generation_number, context.fonts)
     {catalog_root_index, page_references, page_objects} = build_pages(context, page_root_index)
     page_tree = {{:obj, page_root_index, context.generation_number},
@@ -28,11 +28,11 @@ defmodule Gutenex.PDF.Builder do
     build_fonts({current_index, generation_number}, Map.to_list(fonts), %{}, [])
   end
 
-  def build_fonts({current_index, generation_number}, [], font_references, font_objects) do
+  def build_fonts({current_index, _generation_number}, [], font_references, font_objects) do
     {current_index, font_references, Enum.reverse(font_objects)}
   end
 
-  def build_fonts({current_index, generation_number}, [{font_alias, font_definition}|rest_of_fonts]=fonts, font_references, font_objects) do
+  def build_fonts({current_index, generation_number}, [{font_alias, font_definition}|rest_of_fonts], font_references, font_objects) do
     font_objects = [{{:obj, current_index, generation_number}, {:dict, font_definition}} | font_objects]
     font_references = Map.put font_references, font_alias, {:ptr, current_index, generation_number}
     next_index = current_index + 1
@@ -116,5 +116,99 @@ defmodule Gutenex.PDF.Builder do
       "Font" => {:dict, font_references },
       "XObject" => image_references
     }}
+  end
+
+  def image_to_x_object(%Imagineer.Image{format: :png}=image, object_number, object_generation_number) do
+    image_to_x_object(image, {object_number, object_generation_number})
+  end
+
+  defp image_to_x_object(image, {object_index, object_generation_number}) when is_integer(object_index) do
+    {extra_attributes, extra_object} = extras(image)
+    # total_object_count is object_index + 1 if there is an extra object
+    total_object_count = if extra_object == [] do
+      object_index
+    else
+      object_index + 1
+    end
+    {
+      object_index,
+      [
+        {
+          {:obj, total_object_count, object_generation_number},
+          {:stream,
+            image_attributes(image, extra_attributes),
+            image.content
+          }
+        },
+        extra_object
+      ]
+    }
+  end
+
+  def extras(%Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}=image) do
+    extra_attributes = %{
+      "Filter"            => {:name, "FlateDecode"},
+      "ColorSpace"        => {:name, Image.png_color(image.attributes.color_type)},
+      "DecodeParms"       => decode_params(image),
+      "BitsPerComponent"  => image.bit_depth
+    }
+    { extra_attributes, []}
+  end
+
+  defp image_attributes(image, extra_attributes) do
+    {:dict,
+      Map.merge(%{
+        "Type"    => {:name, "XObject"},
+        "Width"   => image.width,
+        "Height"  => image.height,   
+        "Subtype" => {:name, "Image"}
+      }, extra_attributes)
+    }
+  end
+
+  defp decode_params(image) do
+    {
+      :dict,
+      %{
+        "Colors"            => Image.png_bits(image.attributes.color_type),
+        "Columns"           => image.width,
+        "Predictor"         => 15,
+        "BitsPerComponent"  => image.bit_depth
+      }
+    }
+  end
+
+  def images_summary(images, object_index, object_generation_number) do
+    images_summary(images, {object_index, object_generation_number}, %{}, [])
+  end
+
+  def images_summary([], {object_index, object_generation_number}, image_aliases, x_objects) do
+    aliases = image_aliases_objects(image_aliases, object_generation_number)
+    summary = {
+      {:obj, object_index, object_generation_number},
+      {:dict, aliases}
+    }
+    {
+      object_index + 1,
+      {:ptr, object_index, object_generation_number},
+      Enum.reverse([summary|x_objects])
+    }
+  end
+
+  def images_summary([current_image | images_tail], {object_index, object_generation_number}, image_aliases, x_objects) do
+    {next_object_index, x_objects} = case image_to_x_object(current_image, {object_index, object_generation_number}) do
+      {next_object_index, [x_object, []]} ->
+        {next_object_index, [x_object | x_objects]}
+      {next_object_index, [x_object, extra_objects]} ->
+        {next_object_index, [x_object, extra_objects | x_objects]}
+    end
+    image_aliases = Map.put image_aliases, "Img#{object_index}", object_index
+    images_summary(images_tail, {next_object_index + 1, object_generation_number}, image_aliases, x_objects)
+  end
+
+  defp image_aliases_objects(images, object_generation_number) do
+    Enum.reduce images, %{}, fn ({aliass, image_index}, aliases) ->
+      Map.put aliases, aliass, {:ptr, image_index, object_generation_number}
+    end
   end
 end
