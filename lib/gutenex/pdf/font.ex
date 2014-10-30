@@ -1,5 +1,8 @@
-defmodule Gutenex.PDF.Fonts do
+defmodule Gutenex.PDF.Font do
   # Helpful PDF on fonts in PDFs: http://www.ntg.nl/eurotex/KacvinskyPDF.pdf
+
+  @default_font_size 12
+  @default_font "Helvetica"
   @standard_fonts  %{
     "Times-Roman" => %{
       "Encoding"  => {:name, "MacRomanEncoding"},
@@ -76,5 +79,18 @@ defmodule Gutenex.PDF.Fonts do
   def standard_fonts do
     @standard_fonts
   end
+
+  def default_font_size do
+    @default_font_size
+  end
   
+
+  def set_font(%{}=fonts, font_name, font_size \\ @default_font_size) do
+    font_name = if Map.has_key?(fonts, font_name) do
+      font_name
+    else
+      @default_font
+    end
+    "/#{font_name} #{font_size} Tf\n"
+  end
 end

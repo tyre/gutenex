@@ -42,20 +42,16 @@ defmodule GutenexTest do
 
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
-    text = """
-    BT
-      /Helvetica 48 Tf
-      20 40 Td
-      0 Tr
-      0.5 g
-      (ABC) Tj
-      /Courier 32 Tf
-      90 Tr
-      (xyz) Tj
-    ET
-    """
-    context = Gutenex.PDF.add_page(%Gutenex.PDF.Context{}, text)
-    File.write "./tmp/alpaca.pdf", Gutenex.PDF.Builder.build(context)
-    |> Gutenex.PDF.Exporter.export()
+    {:ok, pid} = Gutenex.start_link
+    Gutenex.begin_text(pid)
+      |> Gutenex.set_font("Helvetica", 48)
+      |> Gutenex.text_position(20, 40)
+      |> Gutenex.text_render_mode(:fill)
+      |> Gutenex.write_text("ABC")
+      |> Gutenex.set_font("Courier", 32)
+      |> Gutenex.text_render_mode(:stroke)
+      |> Gutenex.write_text("xyz")
+      |> Gutenex.end_text()
+      |> Gutenex.export("./tmp/alpaca.pdf")
   end
 end

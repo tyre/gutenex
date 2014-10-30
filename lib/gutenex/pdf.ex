@@ -15,7 +15,8 @@ defmodule Gutenex.PDF do
     end
   end
 
-  def export(%Context{} = context, _stream) do
+  def export(%Context{} = context, stream) do
+    context = add_page(context, stream)
     Gutenex.PDF.Builder.build(context)
     |> Gutenex.PDF.Exporter.export()
   end
