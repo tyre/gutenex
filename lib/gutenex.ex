@@ -231,18 +231,18 @@ defmodule Gutenex do
   #####################################
 
   @doc """
-    Set the font
-  """
-  def handle_cast({:font, :set, font_name}, [context, stream]) do
-    stream = stream <> Font.set_font(context.fonts, font_name)
-    {:noreply, [context, stream]}
-  end
-
-  @doc """
     Set the font and size
   """
   def handle_cast({:font, :set, {font_name, font_size}}, [context, stream]) do
     stream = stream <> Font.set_font(context.fonts, font_name, font_size)
+    {:noreply, [context, stream]}
+  end
+
+  @doc """
+    Set the font
+  """
+  def handle_cast({:font, :set, font_name}, [context, stream]) do
+    stream = stream <> Font.set_font(context.fonts, font_name)
     {:noreply, [context, stream]}
   end
 

@@ -3,7 +3,7 @@ defmodule Gutenex.PDF.FontTest do
   alias Gutenex.PDF.Font
 
   test "setting a font" do
-    assert Font.set_font(Font.standard_fonts(), "Helvetica", 32) == "/Helvetica 32 Tf\n",
+    assert Font.set_font(Font.standard_fonts(), "Courier", 32) == "/Courier 32 Tf\n",
            "it returns the font set command"
 
     assert Font.set_font(Font.standard_fonts(), "Helvetica") == "/Helvetica 12 Tf\n",
