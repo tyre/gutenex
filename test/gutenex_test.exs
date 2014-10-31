@@ -52,6 +52,7 @@ defmodule GutenexTest do
       |> Gutenex.text_render_mode(:stroke)
       |> Gutenex.write_text("xyz")
       |> Gutenex.end_text()
+      |> Gutenex.draw_image("./test/support/images/alpaca.png")
       |> Gutenex.export("./tmp/alpaca.pdf")
   end
 end

@@ -56,7 +56,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :begin})
     pid
   end
-  
+
   @doc """
   Set the text position
   """
@@ -64,7 +64,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :position, {x_coordinate, y_coordinate}})
     pid
   end
-  
+
   @doc """
   Set the text render mode
   """
@@ -72,7 +72,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :render_mode, render_mode})
     pid
   end
-  
+
   @doc """
   Write text to the stream
   """
@@ -80,7 +80,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :write, text_to_write})
     pid
   end
-  
+
   @doc """
   End a text block
   """
@@ -88,7 +88,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :end})
     pid
   end
-  
+
 
   @doc """
   Set the font
@@ -104,7 +104,7 @@ defmodule Gutenex do
   def set_font(pid, font_name, font_size) do
     GenServer.cast(pid, {:font, :set, {font_name, font_size}})
     pid
-  end  
+  end
 
   @doc """
   Gets the current stream
@@ -130,7 +130,20 @@ defmodule Gutenex do
 
   def export(pid, file_name) do
     File.write file_name, export(pid)
+    pid
   end
+
+  @doc """
+  Add an image by filename
+  """
+  def draw_image(pid, image_file_path) do
+    image = %Imagineer.Image{uri: "./test/support/images/alpaca.png"} |>
+            Imagineer.Image.load() |>
+            Imagineer.Image.process()
+    GenServer.cast(pid, {:image, :write, image})
+    pid
+  end
+
 
   #######################
   ##   Call handlers   ##
@@ -193,7 +206,7 @@ defmodule Gutenex do
     stream = stream <> Text.begin_text
     {:noreply, [context, stream]}
   end
-  
+
   @doc """
     End a section of text
   """
@@ -201,7 +214,7 @@ defmodule Gutenex do
     stream = stream <> Text.end_text
     {:noreply, [context, stream]}
   end
-  
+
   @doc """
     Write some text!
   """
@@ -225,6 +238,14 @@ defmodule Gutenex do
     stream = stream <> Text.render_mode(render_mode)
     {:noreply, [context, stream]}
   end
+
+  def handle_cast({:image, :write, image}, [context, stream]) do
+    image_alias = "Img#{Map.size(context.images)}"
+    images =  Map.put context.images, image_alias, image
+    stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image)
+    {:noreply, [%Context{ images: images}, stream]}
+  end
+
 
   #####################################
   #               Fonts               #
