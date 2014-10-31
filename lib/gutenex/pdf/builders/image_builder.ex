@@ -1,8 +1,8 @@
 defmodule Gutenex.PDF.Builders.ImageBuilder do
-  alias Gutenex.PDF.Image
+  alias Gutenex.PDF.Images
 
   def build(context, start_object_number) do
-    images_summary(context.images, start_object_number, context.generation_number)
+    images_summary(Map.to_list(context.images), start_object_number, context.generation_number)
   end
 
   def image_to_x_object(%Imagineer.Image{format: :png}=image, object_number, object_generation_number) do
@@ -35,7 +35,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   def extras(%Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}=image) do
     extra_attributes = %{
       "Filter"            => {:name, "FlateDecode"},
-      "ColorSpace"        => {:name, Image.png_color(image.attributes.color_type)},
+      "ColorSpace"        => {:name, Images.png_color(image.attributes.color_type)},
       "DecodeParms"       => decode_params(image),
       "BitsPerComponent"  => image.bit_depth
     }
@@ -57,7 +57,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     {
       :dict,
       %{
-        "Colors"            => Image.png_bits(image.attributes.color_type),
+        "Colors"            => Images.png_bits(image.attributes.color_type),
         "Columns"           => image.width,
         "Predictor"         => 15,
         "BitsPerComponent"  => image.bit_depth
@@ -82,14 +82,14 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     }
   end
 
-  def images_summary([current_image | images_tail], {object_index, object_generation_number}, image_aliases, x_objects) do
+  def images_summary([{image_alias, current_image} | images_tail], {object_index, object_generation_number}, image_aliases, x_objects) do
     {next_object_index, x_objects} = case image_to_x_object(current_image, {object_index, object_generation_number}) do
       {next_object_index, [x_object, []]} ->
         {next_object_index, [x_object | x_objects]}
       {next_object_index, [x_object, extra_objects]} ->
         {next_object_index, [x_object, extra_objects | x_objects]}
     end
-    image_aliases = Map.put image_aliases, "Img#{object_index}", object_index
+    image_aliases = Map.put image_aliases, image_alias, object_index
     images_summary(images_tail, {next_object_index + 1, object_generation_number}, image_aliases, x_objects)
   end
 

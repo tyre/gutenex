@@ -10,7 +10,7 @@ defmodule Gutenex.PDF.Context do
       subject: "",
       keywords: ""
     },
-    images: [],
+    images: %{},
     fonts: Gutenex.PDF.Font.standard_fonts(),
     pages: [],
     scripts: [],
