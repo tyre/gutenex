@@ -39,6 +39,10 @@ defmodule GutenexTest do
     assert %Gutenex.PDF.Context{current_page: 2} == Gutenex.context(server)
   end
 
+  test "#move_to", %{server: server} do
+    server = Gutenex.move_to(server, 20, 30)
+    assert "20 30 m " == Gutenex.stream(server)
+  end
 
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")

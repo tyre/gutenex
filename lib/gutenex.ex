@@ -4,6 +4,9 @@ defmodule Gutenex do
   alias Gutenex.PDF.Context
   alias Gutenex.PDF.Text
   alias Gutenex.PDF.Font
+
+  alias Gutenex.Geometry
+
   #######################
   ##       Setup       ##
   #######################
@@ -144,6 +147,18 @@ defmodule Gutenex do
     pid
   end
 
+  #######################
+  ##      Geometry     ##
+  #######################
+
+  def move_to(pid, point_x, point_y) when is_integer(point_x) and is_integer(point_y) do
+    move_to(pid, {point_x, point_y})
+  end
+
+  def move_to(pid, {point_x, point_y}=point) when is_integer(point_x) and is_integer(point_y) do
+    GenServer.cast(pid, {:geometry, :move_to, point})
+    pid
+  end
 
   #######################
   ##   Call handlers   ##
@@ -246,7 +261,6 @@ defmodule Gutenex do
     {:noreply, [%Context{ images: images}, stream]}
   end
 
-
   #####################################
   #               Fonts               #
   #####################################
@@ -266,5 +280,15 @@ defmodule Gutenex do
     stream = stream <> Font.set_font(context.fonts, font_name)
     {:noreply, [context, stream]}
   end
+
+  #####################################
+  #             Geometry              #
+  #####################################
+
+  def handle_cast({:geometry, :move_to, {point_x, point_y}}, [context, stream]) do
+    stream = stream <> Geometry.move_to({point_x, point_y})
+    {:noreply, [context, stream]}
+  end
+
 
 end
