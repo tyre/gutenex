@@ -92,6 +92,9 @@ defmodule Gutenex do
     pid
   end
 
+  #####################################
+  #               Fonts               #
+  #####################################
 
   @doc """
   Set the font
@@ -136,14 +139,23 @@ defmodule Gutenex do
     pid
   end
 
+
+  #####################################
+  #              Images               #
+  #####################################
+
   @doc """
   Add an image by filename
   """
   def draw_image(pid, image_file_path) do
-    image = %Imagineer.Image{uri: "./test/support/images/alpaca.png"} |>
+    draw_image(pid, image_file_path, %{})
+  end
+
+  def draw_image(pid, image_file_path, options) do
+    image = %Imagineer.Image{uri: image_file_path} |>
             Imagineer.Image.load() |>
             Imagineer.Image.process()
-    GenServer.cast(pid, {:image, :write, image})
+    GenServer.cast(pid, {:image, :write, {image, options}})
     pid
   end
 
@@ -254,10 +266,14 @@ defmodule Gutenex do
     {:noreply, [context, stream]}
   end
 
-  def handle_cast({:image, :write, image}, [context, stream]) do
+  #####################################
+  #              Images               #
+  #####################################
+
+  def handle_cast({:image, :write, {image, options}}, [context, stream]) do
     image_alias = "Img#{Map.size(context.images)}"
     images =  Map.put context.images, image_alias, image
-    stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image)
+    stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image, options)
     {:noreply, [%Context{ images: images}, stream]}
   end
 
@@ -289,6 +305,4 @@ defmodule Gutenex do
     stream = stream <> Geometry.move_to({point_x, point_y})
     {:noreply, [context, stream]}
   end
-
-
 end

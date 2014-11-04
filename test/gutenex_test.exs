@@ -41,22 +41,26 @@ defmodule GutenexTest do
 
   test "#move_to", %{server: server} do
     server = Gutenex.move_to(server, 20, 30)
-    assert "20 30 m " == Gutenex.stream(server)
+    assert "20 30 m\n" == Gutenex.stream(server)
   end
 
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
     {:ok, pid} = Gutenex.start_link
-    Gutenex.begin_text(pid)
+      Gutenex.begin_text(pid)
       |> Gutenex.set_font("Helvetica", 48)
-      |> Gutenex.text_position(20, 40)
+      |> Gutenex.text_position(40, 180)
       |> Gutenex.text_render_mode(:fill)
       |> Gutenex.write_text("ABC")
       |> Gutenex.set_font("Courier", 32)
       |> Gutenex.text_render_mode(:stroke)
       |> Gutenex.write_text("xyz")
       |> Gutenex.end_text()
-      |> Gutenex.draw_image("./test/support/images/alpaca.png")
+      |> Gutenex.move_to(400, 20)
+      |> Gutenex.draw_image("./test/support/images/alpaca.png", %{
+        translate_x: 300,
+        translate_y: 500,
+      })
       |> Gutenex.export("./tmp/alpaca.pdf")
   end
 end
