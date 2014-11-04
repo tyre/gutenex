@@ -1,8 +1,10 @@
 defmodule Gutenex.Geometry.Line do
-  import Gutenex.Geometry.Utils
+  import Gutenex.Geometry
 
   def line({from_point, to_point}) do
-    move_to(from_point) ++ draw_line(to_point) ++ 'S\n'
+    move_to(from_point) <>
+    draw_line(to_point) <>
+    "S\n"
   end
 
   def line({from_x, from_y}, {to_x, to_y}) do
@@ -18,6 +20,6 @@ defmodule Gutenex.Geometry.Line do
   end
 
   defp draw_line({point_x, point_y}) do
-    character_list([point_x, point_y]) ++ 'l '
+    "#{point_x} #{point_y} l "
   end
 end

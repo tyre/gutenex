@@ -1,5 +1,5 @@
 defmodule Gutenex.Geometry.Rectangle do
-  import Gutenex.Geometry.Utils
+  import Gutenex.Geometry
 
 
 # def rectangle({height_x, height_y}, {width_x, width_y})do

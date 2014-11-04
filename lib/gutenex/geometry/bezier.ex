@@ -1,4 +1,4 @@
 defmodule Gutenex.Geometry.Bezier do
-  import Gutenex.Geometry.Utils
+  import Gutenex.Geometry
 
 end
