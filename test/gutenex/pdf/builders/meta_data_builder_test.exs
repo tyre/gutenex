@@ -1,16 +1,13 @@
-defmodule Gutenex.PDF.BuilderTest do
+defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
   use ExUnit.Case, async: true
-  alias Gutenex.PDF.Builder
   alias Gutenex.PDF.Context
+  alias Gutenex.PDF.Builders.MetaDataBuilder
 
-  test "#build_catalog" do
-    assert Builder.build_catalog(99, 7) == {:dict, %{
-           "Type"  => {:name, "Catalog"},
-           "Pages" => {:ptr, 99, 7}}}
-  end
-
-  test "#build_meta_data" do
+  test "#build" do
+    meta_data_index = 20
+    generation_number = 3
     context = %Context{
+      generation_number: generation_number,
       meta_data: %{
         creator: "Thomas Paine",
         creation_date: {{1776, 7, 4}, {15, 15, 15}},
@@ -21,7 +18,8 @@ defmodule Gutenex.PDF.BuilderTest do
         keywords: "free-mp3s how-to-build-a-startup-online stock-tips"
       }
     }
-    {:dict, meta_data} = Builder.build_meta_data(context)
+    {{:obj, ^meta_data_index, ^generation_number}, {:dict, meta_data}} =
+      MetaDataBuilder.build(context, meta_data_index)
     assert Map.get(meta_data, "Title")        ==  {:string, context.meta_data.title}
     assert Map.get(meta_data, "Author")       ==  {:string, context.meta_data.author}
     assert Map.get(meta_data, "Creator")      ==  {:string, context.meta_data.creator}
