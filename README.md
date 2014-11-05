@@ -21,7 +21,7 @@ Up next is rewriting the basic PDF functionality. That means:
 Since this changes the GenServer state to be incompatible with erlguten, the
 wrapper functions will be removed.
 
-# Current Usage
+# Usage
 
 ```elixir
   {:ok, pid} = Gutenex.start_link
