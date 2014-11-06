@@ -1,13 +1,15 @@
 defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
   use ExUnit.Case, async: true
   alias Gutenex.PDF.Context
+  alias Gutenex.PDF.RenderContext
   alias Gutenex.PDF.Builders.MetaDataBuilder
 
-  test "#build" do
-    meta_data_index = 20
-    generation_number = 3
+  setup do
+    render_context = %RenderContext{
+      generation_number: 3,
+      current_index: 100
+    }
     context = %Context{
-      generation_number: generation_number,
       meta_data: %{
         creator: "Thomas Paine",
         creation_date: {{1776, 7, 4}, {15, 15, 15}},
@@ -18,8 +20,21 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
         keywords: "free-mp3s how-to-build-a-startup-online stock-tips"
       }
     }
-    {{:obj, ^meta_data_index, ^generation_number}, {:dict, meta_data}} =
-      MetaDataBuilder.build(context, meta_data_index)
+    {:ok, %{render_context: render_context, context: context}}
+  end
+
+  test "#build", %{render_context: render_context, context: context} do
+    {new_render_context, _new_context} = MetaDataBuilder.build({render_context, context})
+    meta_data_index = render_context.current_index + 1
+    generation_number = render_context.generation_number
+
+    {
+      {:obj, ^meta_data_index, ^generation_number},
+      {:dict, meta_data}
+    } = new_render_context.meta_data
+
+    assert new_render_context.meta_data_index == meta_data_index
+    assert new_render_context.current_index == meta_data_index
     assert Map.get(meta_data, "Title")        ==  {:string, context.meta_data.title}
     assert Map.get(meta_data, "Author")       ==  {:string, context.meta_data.author}
     assert Map.get(meta_data, "Creator")      ==  {:string, context.meta_data.creator}

@@ -1,9 +1,11 @@
 defmodule Gutenex.PDF.Builders.PageBuilder do
   alias Gutenex.PDF.Context
-  # Pages are built into two objects
-  # The first contains the stream of the page contents
-  # The second is a dictionary describing the page, a reference to the
-  # page tree, and a reference to the page contents
+  @doc """
+    Pages are built into two objects
+    The first contains the stream of the page contents
+    The second is a dictionary describing the page, a reference to the
+    page tree, and a reference to the page contents
+  """
   def build(%Context{} = context, root_index) do
     build({root_index, context.generation_number}, root_index + 1, context.pages, [], [])
   end

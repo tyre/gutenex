@@ -1,14 +1,23 @@
 defmodule Gutenex.PDF.Builders.CatalogBuilder do
+  alias Gutenex.PDF.RenderContext
   alias Gutenex.PDF.Context
 
-  def build(%Context{}=context, catalog_root_index, page_root_index) do
-    {{:obj, catalog_root_index, context.generation_number},
-                build_catalog(page_root_index, context.generation_number)}
+  def build({%RenderContext{}=render_context, %Context{}=context}) do
+    render_context= add_catalog(render_context)
+    |> RenderContext.next_index
+    {render_context, context}
   end
 
-  defp build_catalog(page_tree_reference, generation_number) do
-    {:dict, %{
-      "Type" => {:name, "Catalog"},
-      "Pages" => {:ptr, page_tree_reference, generation_number}}}
+  defp add_catalog(%RenderContext{}=render_context) do
+    %RenderContext{
+      render_context |
+      catalog: {
+        {:obj, render_context.current_index, render_context.generation_number},
+        {:dict, %{
+          "Type" => {:name, "Catalog"},
+          "Pages" => RenderContext.page_tree_reference(render_context)
+        }}
+      }
+    }
   end
 end

@@ -7,7 +7,7 @@ defmodule Gutenex.PDF.Builder do
   alias Gutenex.PDF.Builders.CatalogBuilder
   alias Gutenex.PDF.Builders.MetaDataBuilder
 
-  def build(%Context{} = context) do
+  def build(%Context{}=context) do
     {next_index, image_references, image_objects} = ImageBuilder.build(context, 1)
     {page_root_index, font_references, font_objects} = FontBuilder.build(context, next_index)
     {catalog_root_index, page_references, page_objects} = PageBuilder.build(context, page_root_index)
