@@ -4,40 +4,36 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   alias Gutenex.PDF.Images
 
   def build(%RenderContext{}=render_context, %Context{}=context) do
-    render_context = add_images_summary(render_context, context)
+    render_context = add_images(render_context, Map.to_list(context.images))
+    {render_context, context}
   end
 
-  defp add_images_summary(%RenderContext{}=render_context, %Context{}=context) do
-    images_summary(Map.to_list(context.images), render_context)
+  def add_images(%RenderContext{generation_number: generation_number}=render_context, []) do
+    add_image_summary(render_context)
   end
 
-  def images_summary([], %RenderContext{generation_number: generation_number}=render_context) do
-    {render_context, summary} = summary_object(render_context, aliases)
-    %RenderContext{
-      render_context |
-      image_summary_reference: {:ptr, render_context.current_index, generation_number},
-      image_aliases: image_aliases,
-      image_objects: Enum.reverse([summary|x_objects]
-    }
+  def add_images(%RenderContext{generation_number: generation_number}=render_context, [{image_alias, current_image} | images_tail]) do
+    add_image(render_context, current_image, image_alias)
+    |> add_images(images_tail)
   end
 
-  def images_summary([{image_alias, current_image} | images_tail], %RenderContext{generation_number: generation_number}=render_context) do
-    render_context = add_image(render_context, current_image, image_alias)
-    images_summary(images_tail, render_context)
-  end
-
-  defp add_image(render_context, image, aliaz) do
+  defp add_image(render_context, image, image_alias) do
     add_image_extra_object(render_context, image)
     |> RenderContext.next_index
     |> add_image_object(image)
-    |> add_image_alias(aliaz)
+    |> add_image_alias(image_alias)
   end
 
-  defp summary_object(render_context, aliases) do
+  def add_image_summary(%RenderContext{}=render_context) do
     render_context = RenderContext.next_index(render_context)
-    {
-      render_context,
-      {{:obj, render_context.current_index, render_context.generation_number}, {:dict, aliases}}
+    summary = {
+      {:obj, render_context.current_index, render_context.generation_number},
+      {:dict, render_context.image_aliases}
+    }
+    %RenderContext{
+      render_context |
+      image_summary_reference: {:ptr, render_context.current_index, render_context.generation_number},
+      image_objects: Enum.reverse([summary|render_context.image_objects])
     }
   end
 
@@ -49,13 +45,13 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     image_object = {
       {:obj, render_context.current_index, render_context.generation_number},
       {:stream,
-        image_attributes(image, extras_attributes(image)),
+        image_attributes(image, extra_attributes(image)),
         image.content
       }
     }
     %RenderContext{
       render_context |
-      images: [image_object | render_context.images]
+      image_objects: [image_object | render_context.image_objects]
     }
   end
 
@@ -63,10 +59,11 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   Adds the alias to the RenderContext#image_aliases map, under the assumption
   that the current index is that of the image object
   """
-  defp add_image_alias(render_context, aliaz) do
+  defp add_image_alias(render_context, image_alias) do
+    image_reference = {:ptr, render_context.current_index, render_context.generation_number}
     %RenderContext{
       render_context |
-      image_aliases: Map.put(RenderContext.image_aliases, aliaz, {:ptr, render_context.current_index, render_context.generation_number})
+      image_aliases: Map.put(render_context.image_aliases, image_alias, image_reference)
     }
   end
 

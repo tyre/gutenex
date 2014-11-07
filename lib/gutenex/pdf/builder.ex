@@ -7,8 +7,10 @@ defmodule Gutenex.PDF.Builder do
   alias Gutenex.PDF.Builders.CatalogBuilder
   alias Gutenex.PDF.Builders.MetaDataBuilder
 
+  # The way I'm building this looks suspiciously like a GenServer...
   def build(%Context{}=context) do
-    {next_index, image_references, image_objects} = ImageBuilder.build(context, 1)
+    render_context = %RenderContext{current_index: 1}
+    {next_index, image_references, image_objects} = ImageBuilder.build({render_context, context})
     {page_root_index, font_references, font_objects} = FontBuilder.build(context, next_index)
     {catalog_root_index, page_references, page_objects} = PageBuilder.build(context, page_root_index)
     page_tree = PageTreeBuilder.build(context, page_root_index, %{
