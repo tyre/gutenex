@@ -9,6 +9,7 @@ defmodule Gutenex.PDF.RenderContext do
     meta_data: nil,
     image_objects: [],
     font_objects: [],
+    page_objects: [],
 
     # References
     image_references: [],
@@ -20,17 +21,10 @@ defmodule Gutenex.PDF.RenderContext do
 
     # Indicies
     image_summary_reference: nil,
-    page_tree_index: nil,
+    page_tree_reference: nil,
     catalog_index: nil,
     meta_data_index: nil
   )
-
-  @doc """
-  Returns a pointer to the page tree index with the current generation number
-  """
-  def page_tree_reference(%RenderContext{}=render_context) do
-    {:ptr, render_context.page_tree_index, render_context.generation_number}
-  end
 
   @doc """
   Returns RenderContext where the render context's current_index

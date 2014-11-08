@@ -15,7 +15,7 @@ defmodule Gutenex.PDF.Builders.CatalogBuilder do
         {:obj, render_context.current_index, render_context.generation_number},
         {:dict, %{
           "Type" => {:name, "Catalog"},
-          "Pages" => RenderContext.page_tree_reference(render_context)
+          "Pages" => render_context.page_tree_reference
         }}
       }
     }
