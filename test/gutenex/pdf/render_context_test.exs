@@ -10,8 +10,7 @@ defmodule Gutenex.PDF.RenderContextTest do
 
   test "#next_index" do
     render_context = %RenderContext{current_index: 11}
-    {new_render_context, next_index} = RenderContext.next_index(render_context)
+    new_render_context = RenderContext.next_index(render_context)
     assert new_render_context.current_index == render_context.current_index + 1
-    assert next_index == render_context.current_index + 1
   end
 end

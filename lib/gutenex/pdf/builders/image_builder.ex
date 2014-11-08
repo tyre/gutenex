@@ -3,7 +3,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   alias Gutenex.PDF.RenderContext
   alias Gutenex.PDF.Images
 
-  def build(%RenderContext{}=render_context, %Context{}=context) do
+  def build({%RenderContext{}=render_context, %Context{}=context}) do
     render_context = add_images(render_context, Map.to_list(context.images))
     {render_context, context}
   end

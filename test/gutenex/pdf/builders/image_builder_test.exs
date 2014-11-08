@@ -15,7 +15,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilderTest do
   test "#build", %{image: image, image_x_object: x_object} do
     context = %Context{images: %{"Bobby" => image}, generation_number: 30}
     {_obj_count, [raw_x_object, []]} = x_object
-    {new_render_context, ^context} = ImageBuilder.build(%RenderContext{current_index: 100, generation_number: 30}, context)
+    {new_render_context, ^context} = ImageBuilder.build({%RenderContext{current_index: 100, generation_number: 30}, context})
     assert new_render_context.current_index == 102
     assert new_render_context.image_objects == [raw_x_object, {{:obj, 102, 30}, {:dict, %{"Bobby" => {:ptr, 101, 30}}}}]
   end
@@ -27,7 +27,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilderTest do
     assert new_render_context.image_objects == [{{:obj, 101, 40}, {:dict, %{}}}]
   end
 
-  test "#add_image_summary with one image", %{image: image, image_x_object: x_object} do
+  test "#add_image_summary with one image", %{image_x_object: x_object} do
     {_obj_count, [raw_x_object, []]} = x_object
     new_render_context = ImageBuilder.add_image_summary(%RenderContext{
       image_objects: [raw_x_object],

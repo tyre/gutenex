@@ -8,6 +8,7 @@ defmodule Gutenex.PDF.RenderContext do
     catalog: nil,
     meta_data: nil,
     image_objects: [],
+    font_objects: [],
 
     # References
     image_references: [],
