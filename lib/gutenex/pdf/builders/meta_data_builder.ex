@@ -13,22 +13,25 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilder do
   end
 
   defp add_meta_data_to_render_context(%RenderContext{}=render_context, %Context{}=context) do
-    set_meta_data_index(render_context)
+    set_meta_data_reference(render_context)
     |> set_meta_data(context)
   end
 
   defp set_meta_data(%RenderContext{}=render_context, %Context{}=context) do
     %RenderContext{ render_context |
       meta_data: {
-        {:obj, render_context.meta_data_index, render_context.generation_number},
+        {:obj, render_context.current_index, render_context.generation_number},
         meta_data_dictionary(context)
       }
     }
   end
 
-  defp set_meta_data_index(%RenderContext{}=render_context) do
+  defp set_meta_data_reference(%RenderContext{}=render_context) do
     render_context = RenderContext.next_index(render_context)
-    %RenderContext{ render_context | meta_data_index: render_context.current_index}
+    %RenderContext{
+      render_context |
+      meta_data_reference: RenderContext.current_reference(render_context)
+    }
   end
 
   defp meta_data_dictionary(%Context{}=context) do

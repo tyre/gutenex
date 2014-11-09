@@ -33,7 +33,7 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
       {:dict, meta_data}
     } = new_render_context.meta_data
 
-    assert new_render_context.meta_data_index == meta_data_index
+    assert new_render_context.meta_data_reference == {:ptr, 101, 3}
     assert new_render_context.current_index == meta_data_index
     assert Map.get(meta_data, "Title")        ==  {:string, context.meta_data.title}
     assert Map.get(meta_data, "Author")       ==  {:string, context.meta_data.author}

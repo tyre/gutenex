@@ -13,17 +13,15 @@ defmodule Gutenex.PDF.RenderContext do
     page_objects: [],
 
     # References
+    meta_data_reference: nil,
+    catalog_reference: nil,
+    page_tree_reference: nil,
+    image_summary_reference: nil,
     page_references: [],
 
     # Aliases
     font_aliases: %{},
-    image_aliases: %{},
-
-    # Indicies
-    image_summary_reference: nil,
-    page_tree_reference: nil,
-    catalog_index: nil,
-    meta_data_index: nil
+    image_aliases: %{}
   )
 
   @doc """
@@ -32,6 +30,15 @@ defmodule Gutenex.PDF.RenderContext do
   """
   def next_index(%RenderContext{}=render_context) do
     %RenderContext{render_context | current_index: render_context.current_index + 1}
+  end
+
+
+  @doc """
+  Returns a reference to the current index and generation number of the provided
+  render context
+  """
+  def current_reference(%RenderContext{}=render_context) do
+    {:ptr, render_context.current_index, render_context.generation_number}
   end
 
   @doc """
