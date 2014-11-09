@@ -22,7 +22,7 @@ defmodule Gutenex.PDF.Builders.FontBuilderTest do
   end
 
   test "#build adds the font references", %{render_context: render_context} do
-    assert render_context.font_references == %{
+    assert render_context.font_aliases == %{
       "Abra" => {:ptr, 100, 47},
       "Barbara" => {:ptr, 101, 47},
       "Cabana" => {:ptr, 102, 47}

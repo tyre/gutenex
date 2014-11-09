@@ -19,15 +19,15 @@ defmodule Gutenex.PDF.Builders.FontBuilder do
   defp build_fonts(%RenderContext{}=render_context, [{font_alias, font_definition} | fonts]) do
     render_context = %RenderContext{
       RenderContext.next_index(render_context) |
-      font_references: add_font_reference(render_context, font_alias),
+      font_aliases: add_font_alias(render_context, font_alias),
       font_objects: add_font_object(render_context, font_definition)
     }
     build_fonts(render_context, fonts)
   end
 
-  defp add_font_reference(render_context, font_alias) do
+  defp add_font_alias(render_context, font_alias) do
     reference = {:ptr, render_context.current_index, render_context.generation_number}
-    Map.put(render_context.font_references, font_alias, reference)
+    Map.put(render_context.font_aliases, font_alias, reference)
   end
 
   defp add_font_object(render_context, font_definition) do

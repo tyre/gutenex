@@ -7,16 +7,16 @@ defmodule Gutenex.PDF.RenderContext do
     # Objects
     catalog: nil,
     meta_data: nil,
+    page_tree: nil,
     image_objects: [],
     font_objects: [],
     page_objects: [],
 
     # References
-    image_references: [],
-    font_references: %{},
     page_references: [],
 
     # Aliases
+    font_aliases: %{},
     image_aliases: %{},
 
     # Indicies
@@ -34,5 +34,17 @@ defmodule Gutenex.PDF.RenderContext do
     %RenderContext{render_context | current_index: render_context.current_index + 1}
   end
 
+  @doc """
+  Returns a list of all font references for the given render context
+  """
+  def font_references(%RenderContext{}=render_context) do
+    Map.values render_context.font_aliases
+  end
 
+  @doc """
+  Returns a list of all image references for the given render context
+  """
+  def image_references(%RenderContext{}=render_context) do
+    Map.values render_context.image_aliases
+  end
 end
