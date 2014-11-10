@@ -1,5 +1,5 @@
 defmodule Gutenex.PDF.Exporter do
-
+  alias Gutenex.PDF.Serialization
   # Declare the PDF version and a magic comment to imply binary data
   @start_mark """
   %PDF-1.4
@@ -8,7 +8,7 @@ defmodule Gutenex.PDF.Exporter do
 
   def export({root_index, generation_number, meta_data_index, objects}) do
     serialized_objects =
-      Enum.map(objects, &Gutenex.PDF.Serialization.serialize/1)
+      Enum.map(objects, &Serialization.serialize/1)
     @start_mark <>
     Enum.join(serialized_objects) <>
     cross_reference_table(serialized_objects) <>
@@ -18,13 +18,12 @@ defmodule Gutenex.PDF.Exporter do
   end
 
   def trailer(root_index, generation_number, meta_data_index, objects) do
-    """
-    trailer
-      << /Size #{length(objects) + 1}
-        /Root #{root_index} #{generation_number} R
-        /Info #{meta_data_index} #{generation_number} R
-      >>
-    """
+    Serialization.serialize({:trailer, {:dict,
+      %{
+        "Size" => length(objects) + 1,
+        "Root" => {:ptr, root_index, generation_number},
+        "Info" => {:ptr, meta_data_index, generation_number}
+      }}})
   end
 
   def cross_reference_table(serialized_objects) do
