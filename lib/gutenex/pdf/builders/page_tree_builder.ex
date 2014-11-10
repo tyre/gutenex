@@ -3,10 +3,9 @@ defmodule Gutenex.PDF.Builders.PageTreeBuilder do
   alias Gutenex.PDF.RenderContext
 
   def build({%RenderContext{}=render_context, %Context{}=context}) do
-    render_context = RenderContext.next_index(render_context)
     {
       %RenderContext{
-        render_context |
+        RenderContext.next_index(render_context) |
         page_tree_reference: {:ptr, render_context.current_index, render_context.generation_number},
         page_tree: build_page_tree(render_context, context)
       },
@@ -33,7 +32,7 @@ defmodule Gutenex.PDF.Builders.PageTreeBuilder do
   def page_resources(%RenderContext{}=render_context) do
     {:dict, %{
       "Font" => {:dict, render_context.font_aliases},
-      "XObject" => {:dict, render_context.image_aliases}
+      "XObject" => render_context.image_summary_reference
     }}
   end
 end

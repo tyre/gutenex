@@ -19,19 +19,18 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
 
   defp add_image(render_context, image, image_alias) do
     add_image_extra_object(render_context, image)
-    |> RenderContext.next_index
     |> add_image_object(image)
     |> add_image_alias(image_alias)
+    |> RenderContext.next_index
   end
 
   def add_image_summary(%RenderContext{}=render_context) do
-    render_context = RenderContext.next_index(render_context)
     summary = {
       {:obj, render_context.current_index, render_context.generation_number},
       {:dict, render_context.image_aliases}
     }
     %RenderContext{
-      render_context |
+      RenderContext.next_index(render_context) |
       image_summary_reference: {:ptr, render_context.current_index, render_context.generation_number},
       image_objects: Enum.reverse([summary|render_context.image_objects])
     }

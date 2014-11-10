@@ -16,8 +16,8 @@ defmodule Gutenex.PDF.Builder do
     {render_context, ^context} = {%RenderContext{}, context}
       |> ImageBuilder.build
       |> FontBuilder.build
-      |> PageBuilder.build
       |> PageTreeBuilder.build
+      |> PageBuilder.build
       |> CatalogBuilder.build
       |> MetaDataBuilder.build
   end

@@ -12,12 +12,12 @@ defmodule Gutenex.PDF.PageTreeBuilderTest do
   test "#page_resources builds a dictionary of fonts and image objects" do
     render_context = %RenderContext{
       font_aliases: %{"Helvetica" => {:ptr, 31, 0}, "Times-Roman" => {:ptr, 28, 0}},
-      image_aliases: %{"Mock" => {:ptr, 1, 0}, "Ing" => {:ptr, 2, 0}}
+      image_summary_reference: {:ptr, 2, 0}
     }
     assert PageTreeBuilder.page_resources(render_context) == {
       :dict, %{
         "Font" => {:dict, render_context.font_aliases},
-        "XObject" => {:dict, render_context.image_aliases}
+        "XObject" => render_context.image_summary_reference
       }
     }
   end
@@ -36,20 +36,16 @@ defmodule Gutenex.PDF.PageTreeBuilderTest do
         "Bango" => {:ptr, 6, 0},
         "Bongo" => {:ptr, 9, 0}
       },
-      image_aliases: %{
-        "Alpaca" => {:ptr, 1, 0},
-        "Byzantium" => {:ptr, 2, 0}
-      }
-
+      image_summary_reference: {:ptr, 76, 0}
     }
 
     {updated_render_context, ^context} = PageTreeBuilder.build({render_context, context})
     {
-      {:obj, 100, 0},
+      {:obj, 99, 0},
       {:dict, page_tree}
     } = updated_render_context.page_tree
 
-    assert updated_render_context.page_tree_reference == {:ptr, 100, 0}
+    assert updated_render_context.page_tree_reference == {:ptr, 99, 0}
     assert Map.get(page_tree, "Type")      == {:name, "Pages"}
     assert Map.get(page_tree, "Kids")      == {:array,
       [{:ptr, 4, 0}, {:ptr, 8, 0}, {:ptr, 15, 0}, {:ptr, 16, 0}, {:ptr, 23, 0},
@@ -59,7 +55,7 @@ defmodule Gutenex.PDF.PageTreeBuilderTest do
     assert Map.get(page_tree, "Resources") == {:dict,
       %{
         "Font" => {:dict, render_context.font_aliases},
-        "XObject" => {:dict, render_context.image_aliases}
+        "XObject" => render_context.image_summary_reference
       }
     }
   end

@@ -10,6 +10,7 @@ defmodule Gutenex.PDF.Builders.PageBuilder do
   """
   def build({%RenderContext{}=render_context, %Context{}=context}) do
     updated_render_context = build_pages(render_context, context.pages)
+    |> add_page_references_to_page_tree
     {updated_render_context, context}
   end
 
@@ -63,5 +64,21 @@ defmodule Gutenex.PDF.Builders.PageBuilder do
 
   defp page_reference(render_context) do
     {:ptr, render_context.current_index, render_context.generation_number}
+  end
+
+  defp add_page_references_to_page_tree(render_context) do
+    {
+      {:obj, _, _}=page_tree_obj,
+      {:dict, page_tree_dict}
+    } = render_context.page_tree
+    updated_page_tree = Map.put(page_tree_dict, "Kids", {:array, render_context.page_references})
+    |> Map.put("Count", length(render_context.page_references))
+    %RenderContext{
+      render_context |
+      page_tree: {
+        page_tree_obj,
+        {:dict, updated_page_tree}
+      }
+    }
   end
 end

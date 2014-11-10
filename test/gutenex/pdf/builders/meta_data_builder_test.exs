@@ -25,7 +25,7 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
 
   test "#build", %{render_context: render_context, context: context} do
     {new_render_context, _new_context} = MetaDataBuilder.build({render_context, context})
-    meta_data_index = render_context.current_index + 1
+    meta_data_index = render_context.current_index
     generation_number = render_context.generation_number
 
     {
@@ -33,8 +33,8 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
       {:dict, meta_data}
     } = new_render_context.meta_data
 
-    assert new_render_context.meta_data_reference == {:ptr, 101, 3}
-    assert new_render_context.current_index == meta_data_index
+    assert new_render_context.meta_data_reference == {:ptr, 100, 3}
+    assert new_render_context.current_index == meta_data_index + 1
     assert Map.get(meta_data, "Title")        ==  {:string, context.meta_data.title}
     assert Map.get(meta_data, "Author")       ==  {:string, context.meta_data.author}
     assert Map.get(meta_data, "Creator")      ==  {:string, context.meta_data.creator}

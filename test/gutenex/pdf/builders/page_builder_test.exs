@@ -11,7 +11,10 @@ defmodule Gutenex.PDF.Builders.PageBuilderTest do
 
     context = %Context{pages: [page_1, page_2]}
     {render_context, ^context} = PageBuilder.build({
-      %RenderContext{page_tree_reference: page_tree_reference},
+      %RenderContext{
+        page_tree_reference: page_tree_reference,
+        page_tree: {{:obj, 1, 0}, {:dict, %{}}}
+      },
       context
     })
 
@@ -36,6 +39,14 @@ defmodule Gutenex.PDF.Builders.PageBuilderTest do
                                 "Type" => {:name, "Page"},
                                 "Parent" => page_tree_reference,
                                 "Contents" => {:ptr, 3, 0}}}}
+
+    assert render_context.page_tree == {
+      {:obj, 1, 0},
+      {:dict, %{
+        "Count" => 2,
+        "Kids" => {:array, [{:ptr, 2, 0}, {:ptr, 4, 0}]}
+      }}
+    }
 
   end
 end

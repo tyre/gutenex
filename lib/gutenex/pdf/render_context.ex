@@ -54,4 +54,24 @@ defmodule Gutenex.PDF.RenderContext do
   def image_references(%RenderContext{}=render_context) do
     Map.values render_context.image_aliases
   end
+
+  @doc """
+  Returns a list of all objects for rendering
+  """
+  def objects(%RenderContext{}=render_context) do
+    render_context.image_objects ++
+    render_context.font_objects ++
+    [render_context.page_tree | render_context.page_objects] ++
+    [render_context.catalog, render_context.meta_data]
+  end
+
+  @doc """
+  """
+  def trailer(%RenderContext{}=render_context) do
+    {:trailer, {:dict, %{
+      "Size" => length(objects(render_context)) + 1,
+      "Root" => render_context.catalog_reference,
+      "Info" => render_context.meta_data_reference
+    }}}
+  end
 end
