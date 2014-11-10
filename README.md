@@ -7,9 +7,7 @@ What started out as a wrapper for the Erlang [erlguten](https://github.com/ztmr/
 
 ## Plan
 
-The first steps were to wrap erlguten's functions with Elixir counterparts. Next, we [forked erlguten](https://github.com/SenecaSystems/erlguten) to allow for multiple concurrent PDF generations.
-
-Up next is rewriting the basic PDF functionality. That means:
+Rewriting the basic PDF functionality means:
 
 - [x] text
 - [x] fonts
@@ -17,9 +15,6 @@ Up next is rewriting the basic PDF functionality. That means:
 - [x] rendering/exporting
 - [ ] templating
 - [ ] documentation
-
-Since this changes the GenServer state to be incompatible with erlguten, the
-wrapper functions will be removed.
 
 # Usage
 
