@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gutenex.PDF.RenderContext</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <div id="content">
+      <div class="breadcrumbs">Gutenex v0.0.1-dev &rarr; <a href="overview.html">Overview</a> &rarr; <a href="Gutenex.html">Gutenex</a> &rarr; <a href="Gutenex.PDF.html">PDF</a> &rarr; <a href="Gutenex.PDF.RenderContext.html">RenderContext</a></div>
+
+      <h1>
+        Gutenex.PDF.RenderContext
+        
+      </h1>
+
+      <ul class="summary_links">
+        
+          <li><a href="#summary">Summary</a></li>
+        
+        
+        
+          <li><a href="#functions_details">Functions</a></li>
+        
+        
+        
+      </ul>
+
+      
+
+      
+        <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L1" class="view_source">Source</a>
+      
+
+      
+        <h2 id="summary">Summary<div class="detail_header_links"><a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></div></h2>
+        <table class="summary">
+          <tr>
+  <td class="summary_signature"><a href="#current_reference/1">current_reference(render_context)</a></td>
+  
+    <td class="summary_synopsis"><p>Returns a reference to the current index and generation number of the provided
+render context</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#font_references/1">font_references(render_context)</a></td>
+  
+    <td class="summary_synopsis"><p>Returns a list of all font references for the given render context</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#image_references/1">image_references(render_context)</a></td>
+  
+    <td class="summary_synopsis"><p>Returns a list of all image references for the given render context</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#next_index/1">next_index(render_context)</a></td>
+  
+    <td class="summary_synopsis"><p>Returns RenderContext where the render context’s current_index
+has been incremented by one</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#objects/1">objects(render_context)</a></td>
+  
+    <td class="summary_synopsis"><p>Returns a list of all objects for rendering</p>
+</td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#trailer/1">trailer(render_context)</a></td>
+  
+    <td class="summary_synopsis"></td>
+  
+</tr>
+
+        </table>
+      
+
+      
+
+      
+        <div id="functions_details" class="details_list">
+          <h2>Functions</h2>
+          <div class="detail">
+  <div class="detail_header" id="current_reference/1">
+    <span class="signature"><strong>current_reference(render_context)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#current_reference/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <div class="docstring"><p>Returns a reference to the current index and generation number of the provided
+render context</p>
+</div>
+  
+    <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L40" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="font_references/1">
+    <span class="signature"><strong>font_references(render_context)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#font_references/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <div class="docstring"><p>Returns a list of all font references for the given render context</p>
+</div>
+  
+    <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L47" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="image_references/1">
+    <span class="signature"><strong>image_references(render_context)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#image_references/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <div class="docstring"><p>Returns a list of all image references for the given render context</p>
+</div>
+  
+    <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L54" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="next_index/1">
+    <span class="signature"><strong>next_index(render_context)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#next_index/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <div class="docstring"><p>Returns RenderContext where the render context’s current_index
+has been incremented by one</p>
+</div>
+  
+    <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L31" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="objects/1">
+    <span class="signature"><strong>objects(render_context)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#objects/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <div class="docstring"><p>Returns a list of all objects for rendering</p>
+</div>
+  
+    <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L61" class="view_source">Source</a>
+  
+</div>
+<div class="detail">
+  <div class="detail_header" id="trailer/1">
+    <span class="signature"><strong>trailer(render_context)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(function)</span>
+      <a href="#trailer/1" class="detail_link" title="Link to this function">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <div class="docstring"></div>
+  
+    <a href="https://github.com/SenecaSystems/gutenex/blob/master/lib/gutenex/pdf/render_context.ex#L70" class="view_source">Source</a>
+  
+</div>
+
+        </div>
+      
+
+      
+
+      
+    </div>
+  </body>
+</html>
