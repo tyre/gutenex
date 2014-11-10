@@ -94,6 +94,14 @@ defmodule Gutenex.PDF.Serialization do
     serialize({:stream, {:dict, %{}}, payload})
   end
 
+  def serialize({:trailer, {:dict, _dict}=trailer}) do
+    """
+    trailer
+    #{serialize(trailer)}
+    """
+  end
+
+
   def serialize(untyped) when is_binary(untyped) do
     serialize({:string, untyped})
   end

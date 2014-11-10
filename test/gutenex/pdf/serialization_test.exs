@@ -71,4 +71,15 @@ defmodule Gutenex.PDF.SerializationTest do
            endstream
            """)
   end
+
+  test "#serialize the :trailer" do
+    assert Serialization.serialize({:trailer, {:dict, %{
+      "Size" => 200,
+      "Root" => {:ptr, 200, 0},
+      "Info" => {:ptr, 5, 1}
+    }}}) == """
+    trailer
+    <</Info 5 1 R/Root 200 0 R/Size 200>>
+    """
+  end
 end

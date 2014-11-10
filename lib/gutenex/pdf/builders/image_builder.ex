@@ -1,45 +1,89 @@
 defmodule Gutenex.PDF.Builders.ImageBuilder do
+  alias Gutenex.PDF.Context
+  alias Gutenex.PDF.RenderContext
   alias Gutenex.PDF.Images
 
-  def build(context, start_object_number) do
-    images_summary(Map.to_list(context.images), start_object_number, context.generation_number)
+  def build({%RenderContext{}=render_context, %Context{}=context}) do
+    render_context = add_images(render_context, Map.to_list(context.images))
+    {render_context, context}
   end
 
-  def image_to_x_object(%Imagineer.Image{format: :png}=image, object_number, object_generation_number) do
-    image_to_x_object(image, {object_number, object_generation_number})
+  def add_images(%RenderContext{generation_number: generation_number}=render_context, []) do
+    add_image_summary(render_context)
   end
 
-  defp image_to_x_object(image, {object_index, object_generation_number}) when is_integer(object_index) do
-    {extra_attributes, extra_object} = extras(image)
-    # total_object_count is object_index + 1 if there is an extra object
-    total_object_count = if extra_object == [] do
-      object_index
-    else
-      object_index + 1
-    end
-    {
-      object_index,
-      [
-        {
-          {:obj, total_object_count, object_generation_number},
-          {:stream,
-            image_attributes(image, extra_attributes),
-            image.content
-          }
-        },
-        extra_object
-      ]
+  def add_images(%RenderContext{generation_number: generation_number}=render_context, [{image_alias, current_image} | images_tail]) do
+    add_image(render_context, current_image, image_alias)
+    |> add_images(images_tail)
+  end
+
+  defp add_image(render_context, image, image_alias) do
+    add_image_extra_object(render_context, image)
+    |> add_image_object(image)
+    |> add_image_alias(image_alias)
+    |> RenderContext.next_index
+  end
+
+  def add_image_summary(%RenderContext{}=render_context) do
+    summary = {
+      {:obj, render_context.current_index, render_context.generation_number},
+      {:dict, render_context.image_aliases}
+    }
+    %RenderContext{
+      RenderContext.next_index(render_context) |
+      image_summary_reference: {:ptr, render_context.current_index, render_context.generation_number},
+      image_objects: Enum.reverse([summary|render_context.image_objects])
     }
   end
 
-  def extras(%Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}=image) do
-    extra_attributes = %{
+  @doc """
+  Calculate the attributes, any additional objects, and add the image to the
+  list of images
+  """
+  defp add_image_object(%RenderContext{}=render_context, %Imagineer.Image{format: :png}=image) do
+    image_object = {
+      {:obj, render_context.current_index, render_context.generation_number},
+      {:stream,
+        image_attributes(image, extra_attributes(image)),
+        image.content
+      }
+    }
+    %RenderContext{
+      render_context |
+      image_objects: [image_object | render_context.image_objects]
+    }
+  end
+
+  @doc """
+  Adds the alias to the RenderContext#image_aliases map, under the assumption
+  that the current index is that of the image object
+  """
+  defp add_image_alias(render_context, image_alias) do
+    image_reference = {:ptr, render_context.current_index, render_context.generation_number}
+    %RenderContext{
+      render_context |
+      image_aliases: Map.put(render_context.image_aliases, image_alias, image_reference)
+    }
+  end
+
+  @doc """
+  Extra attributes specific to the image format, color type, or other attributes
+  """
+  def extra_attributes(%Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}=image) do
+    %{
       "Filter"            => {:name, "FlateDecode"},
       "ColorSpace"        => {:name, Images.png_color(image.attributes.color_type)},
       "DecodeParms"       => decode_params(image),
       "BitsPerComponent"  => image.bit_depth
     }
-    { extra_attributes, []}
+  end
+
+  @doc """
+  PNGs with color type 2 have no extra object
+  returns the render_context
+  """
+  defp add_image_extra_object(render_context, %Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}) do
+    render_context
   end
 
   defp image_attributes(image, extra_attributes) do
@@ -63,39 +107,5 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
         "BitsPerComponent"  => image.bit_depth
       }
     }
-  end
-
-  def images_summary(images, object_index, object_generation_number) do
-    images_summary(images, {object_index, object_generation_number}, %{}, [])
-  end
-
-  def images_summary([], {object_index, object_generation_number}, image_aliases, x_objects) do
-    aliases = image_aliases_objects(image_aliases, object_generation_number)
-    summary = {
-      {:obj, object_index, object_generation_number},
-      {:dict, aliases}
-    }
-    {
-      object_index + 1,
-      {:ptr, object_index, object_generation_number},
-      Enum.reverse([summary|x_objects])
-    }
-  end
-
-  def images_summary([{image_alias, current_image} | images_tail], {object_index, object_generation_number}, image_aliases, x_objects) do
-    {next_object_index, x_objects} = case image_to_x_object(current_image, {object_index, object_generation_number}) do
-      {next_object_index, [x_object, []]} ->
-        {next_object_index, [x_object | x_objects]}
-      {next_object_index, [x_object, extra_objects]} ->
-        {next_object_index, [x_object, extra_objects | x_objects]}
-    end
-    image_aliases = Map.put image_aliases, image_alias, object_index
-    images_summary(images_tail, {next_object_index + 1, object_generation_number}, image_aliases, x_objects)
-  end
-
-  defp image_aliases_objects(images, object_generation_number) do
-    Enum.reduce images, %{}, fn ({aliass, image_index}, aliases) ->
-      Map.put aliases, aliass, {:ptr, image_index, object_generation_number}
-    end
   end
 end

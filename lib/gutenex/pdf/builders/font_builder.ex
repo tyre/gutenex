@@ -1,21 +1,43 @@
 defmodule Gutenex.PDF.Builders.FontBuilder do
+  alias Gutenex.PDF.Context
+  alias Gutenex.PDF.RenderContext
 
-  # Builds each font object, returning the last object index, the reference
-  # dictionary (for each font, "FontReference" => {:ptr, font_index, font_generation_number})
-  # and the font objects themselves
-  def build(context, start_object_index) do
-    build({start_object_index, context.generation_number}, Map.to_list(context.fonts), %{}, [])
+  # Builds each font object, adding the font objects and references to the
+  # render context. Returns {render_context, context}
+  def build({%RenderContext{}=render_context, %Context{}=context}) do
+    updated_render_context = build_fonts(render_context, Map.to_list(context.fonts))
+    {updated_render_context, context}
   end
 
-  def build({current_index, _generation_number}, [], font_references, font_objects) do
-    {current_index, font_references, Enum.reverse(font_objects)}
+  defp build_fonts(%RenderContext{}=render_context, []) do
+    %RenderContext{
+      render_context |
+      font_objects: Enum.reverse(render_context.font_objects)
+    }
   end
 
-  def build({current_index, generation_number}, [{font_alias, font_definition}|rest_of_fonts], font_references, font_objects) do
-    font_objects = [{{:obj, current_index, generation_number}, {:dict, font_definition}} | font_objects]
-    font_references = Map.put font_references, font_alias, {:ptr, current_index, generation_number}
-    next_index = current_index + 1
-    build({next_index, generation_number}, rest_of_fonts, font_references, font_objects)
+  defp build_fonts(%RenderContext{}=render_context, [{font_alias, font_definition} | fonts]) do
+    render_context = %RenderContext{
+      RenderContext.next_index(render_context) |
+      font_aliases: add_font_alias(render_context, font_alias),
+      font_objects: add_font_object(render_context, font_definition)
+    }
+    build_fonts(render_context, fonts)
+  end
+
+  defp add_font_alias(render_context, font_alias) do
+    reference = {:ptr, render_context.current_index, render_context.generation_number}
+    Map.put(render_context.font_aliases, font_alias, reference)
+  end
+
+  defp add_font_object(render_context, font_definition) do
+    [
+      {
+        {:obj, render_context.current_index, render_context.generation_number},
+        {:dict, font_definition}
+      }
+      | render_context.font_objects
+    ]
   end
 
 end

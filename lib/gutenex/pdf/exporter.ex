@@ -1,30 +1,30 @@
 defmodule Gutenex.PDF.Exporter do
-
+  alias Gutenex.PDF.RenderContext
+  alias Gutenex.PDF.Serialization
   # Declare the PDF version and a magic comment to imply binary data
   @start_mark """
   %PDF-1.4
   """
   @end_mark "%%EOF\r\n"
 
-  def export({root_index, generation_number, meta_data_index, objects}) do
+  def export(%RenderContext{}=render_context) do
     serialized_objects =
-      Enum.map(objects, &Gutenex.PDF.Serialization.serialize/1)
+      Enum.map(RenderContext.objects(render_context), &Serialization.serialize/1)
     @start_mark <>
     Enum.join(serialized_objects) <>
     cross_reference_table(serialized_objects) <>
-    trailer(root_index, generation_number, meta_data_index, objects) <>
+    Serialization.serialize(RenderContext.trailer(render_context)) <>
     start_cross_reference(serialized_objects) <>
     @end_mark
   end
 
   def trailer(root_index, generation_number, meta_data_index, objects) do
-    """
-    trailer
-      << /Size #{length(objects) + 1}
-        /Root #{root_index} #{generation_number} R
-        /Info #{meta_data_index} #{generation_number} R
-      >>
-    """
+    Serialization.serialize({:trailer, {:dict,
+      %{
+        "Size" => length(objects) + 1,
+        "Root" => {:ptr, root_index, generation_number},
+        "Info" => {:ptr, meta_data_index, generation_number}
+      }}})
   end
 
   def cross_reference_table(serialized_objects) do
@@ -48,7 +48,6 @@ defmodule Gutenex.PDF.Exporter do
     """
   end
 
-
   def xref(serialized_objects, position) do
     objects_length = String.length(serialized_objects)
     {xref1(position, "00000 n"), position + objects_length}
@@ -57,75 +56,5 @@ defmodule Gutenex.PDF.Exporter do
   def xref1(position, string) do
     :io_lib.format("~10.10.0w ~s \n", [position, string])
   end
-
-
-# startxref(Objects) ->
-#     ["startxref\n",
-#      i(lists:foldl(fun(A, Accu) -> objsize(A) + Accu end,
-#        length(startmark()) + length(pdfbmagic()),
-#         Objects)),
-#      "\n"].
-
-
-# %% xref
-# %% 0 9
-# %% 0000000000 65535 f
-# %% 0000000033 00000 n
-# %% 0000000098 00000 n
-# %% 0000000144 00000 n
-# %% 0000000203 00000 n
-# %% 0000000231 00000 n
-# %% 0000000409 00000 n
-# %% 0000000721 00000 n
-# %% 0000000835 00000 n
-# xref(Objects) ->
-#     {XRefs, _EndAccu} =
-#   lists:mapfoldl(
-#     fun xref/2, length(startmark()) + length(pdfbmagic()),
-#     Objects ),
-#     ["xref\n",
-#      "0 ",i(nobjects(Objects) + 1), "\n",
-#      xref1(0,"65535 f"),
-#      XRefs
-#     ].
-
-# xref(Obj, Pos) ->
-#     {xref1(Pos, "00000 n"), Pos + objsize(Obj)}.
-
-# xref1(I, Str) ->
-#     lists:flatten(io_lib:format("~10.10.0w ~s \n", [I,Str])).
-
-# export(InfoRef, Objects) ->
-  #   SortedObjects = lists:keysort(1,Objects),
-  #   BObjects = serialise2bin(SortedObjects),
-  #   b([
-  #      startmark(),
-  #      pdfbmagic(),
-  #      BObjects,
-  #      xref(BObjects),
-  #      trailer(InfoRef, SortedObjects),
-  #      startxref(BObjects),
-  #      endmark()
-  #     ]).
-
-# %% trailer
-# %% <<
-# %% /Size 9
-# %% /Root 1 0 R
-# %% /Info 8 0 R
-# %% >>
-# %% startxref
-# %% 1073
-# %% %%EOF
-# trailer(InfoRef, Objects) ->
-#     [Root] = get_objects_of_type("Catalog", Objects),
-#     RootRef = get_ref(Root),
-#     ["trailer\n",
-#      "<<\n",
-#      "/Size ",i(nobjects(Objects) + 1), "\n",
-#      "/Root ",i(RootRef), " 0 R\n",
-#      "/Info ", i(InfoRef), " 0 R\n",
-#      ">>\n"].
-
 
 end
