@@ -12,7 +12,7 @@ defmodule Gutenex.PDF.Context do
     },
     images: %{},
     fonts: Gutenex.PDF.Font.standard_fonts(),
-    templates: [],
+    templates: [nil],
     template_aliases: %{},
     pages: [],
     scripts: [],
