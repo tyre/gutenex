@@ -15,4 +15,8 @@ defmodule Gutenex.PDF.GraphicsTest do
       "Bubbles!"
     end) == "#{Graphics.save_state()}Bubbles!#{Graphics.restore_state()}"
   end
+
+  test "#paint" do
+    assert Graphics.paint("Banananas") == "/Banananas Do\n"
+  end
 end

@@ -1,9 +1,9 @@
 defmodule Gutenex.PDF.Exporter do
   alias Gutenex.PDF.RenderContext
   alias Gutenex.PDF.Serialization
-  # Declare the PDF version and a magic comment to imply binary data
+  # Declare the PDF version
   @start_mark """
-  %PDF-1.4
+  %PDF-1.7
   """
   @end_mark "%%EOF\r\n"
 

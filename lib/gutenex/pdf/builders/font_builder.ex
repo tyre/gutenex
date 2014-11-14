@@ -26,14 +26,14 @@ defmodule Gutenex.PDF.Builders.FontBuilder do
   end
 
   defp add_font_alias(render_context, font_alias) do
-    reference = {:ptr, render_context.current_index, render_context.generation_number}
+    reference = RenderContext.current_reference(render_context)
     Map.put(render_context.font_aliases, font_alias, reference)
   end
 
   defp add_font_object(render_context, font_definition) do
     [
       {
-        {:obj, render_context.current_index, render_context.generation_number},
+        RenderContext.current_object(render_context),
         {:dict, font_definition}
       }
       | render_context.font_objects

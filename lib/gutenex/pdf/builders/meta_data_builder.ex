@@ -21,7 +21,7 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilder do
     %RenderContext{
       RenderContext.next_index(render_context) |
       meta_data: {
-        {:obj, render_context.current_index, render_context.generation_number},
+        RenderContext.current_object(render_context),
         meta_data_dictionary(context)
       }
     }

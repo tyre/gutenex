@@ -3,6 +3,7 @@ defmodule Gutenex.PDF.Builder do
   alias Gutenex.PDF.RenderContext
   alias Gutenex.PDF.Builders.ImageBuilder
   alias Gutenex.PDF.Builders.FontBuilder
+  alias Gutenex.PDF.Builders.TemplateBuilder
   alias Gutenex.PDF.Builders.PageBuilder
   alias Gutenex.PDF.Builders.PageTreeBuilder
   alias Gutenex.PDF.Builders.CatalogBuilder
@@ -13,9 +14,10 @@ defmodule Gutenex.PDF.Builder do
   Takes in a PDF.Context and returns a PDF.RenderContext
   """
   def build(%Context{}=context) do
-    {render_context, ^context} = {%RenderContext{}, context}
+    {_render_context, ^context} = {%RenderContext{}, context}
       |> ImageBuilder.build
       |> FontBuilder.build
+      |> TemplateBuilder.build
       |> PageTreeBuilder.build
       |> PageBuilder.build
       |> CatalogBuilder.build

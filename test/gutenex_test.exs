@@ -44,6 +44,7 @@ defmodule GutenexTest do
     assert "20 30 m\n" == Gutenex.stream(server)
   end
 
+  @tag integration: true
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
     {:ok, pid} = Gutenex.start_link
