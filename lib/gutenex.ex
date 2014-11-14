@@ -271,7 +271,7 @@ defmodule Gutenex do
   #####################################
 
   def handle_cast({:image, :write, {image, options}}, [context, stream]) do
-    image_alias = "Img#{Map.size(context.images)}"
+    image_alias = Gutenex.PDF.Images.image_alias(image)
     images =  Map.put context.images, image_alias, image
     stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image, options)
     {:noreply, [%Context{ images: images}, stream]}
