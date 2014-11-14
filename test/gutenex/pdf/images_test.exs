@@ -1,6 +1,7 @@
 defmodule Gutenex.PDF.ImagesTest do
   use ExUnit.Case, async: true
   alias Gutenex.PDF.Images
+  alias Imagineer.Image
 
   test "#set_image" do
     aliaz = "Image1000"
@@ -28,5 +29,14 @@ defmodule Gutenex.PDF.ImagesTest do
     image = %Imagineer.Image{width: 100, height: 100}
     assert Images.set_image(aliaz, image, %{skew_x: 15, skew_y: 7}) ==
            "q\n100 15 7 100 0 0 cm\n/#{aliaz} Do\nQ\n"
+  end
+
+  test "#load" do
+    image = %Image{uri: "./test/support/images/alpaca.png"}
+      |> Image.load
+      |> Image.process
+    image_alias = Images.image_alias(image)
+    assert {image_alias, image} ==
+           Images.load("./test/support/images/alpaca.png")
   end
 end

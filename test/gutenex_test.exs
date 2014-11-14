@@ -47,8 +47,13 @@ defmodule GutenexTest do
   @tag integration: true
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
+    {template_alias, template_contents} = Gutenex.PDF.Templates.load("./test/support/templates/cucumber_salads.pdf")
+    {alpaca_alias, alpaca_rendition} = Gutenex.PDF.Images.load("./test/support/images/alpaca.png")
     {:ok, pid} = Gutenex.start_link
-      Gutenex.begin_text(pid)
+      Gutenex.add_template(pid, template_alias, template_contents)
+      |> Gutenex.add_image(alpaca_alias, alpaca_rendition)
+      |> Gutenex.set_template(template_alias)
+      |> Gutenex.begin_text
       |> Gutenex.set_font("Helvetica", 48)
       |> Gutenex.text_position(40, 180)
       |> Gutenex.text_render_mode(:fill)
@@ -56,9 +61,9 @@ defmodule GutenexTest do
       |> Gutenex.set_font("Courier", 32)
       |> Gutenex.text_render_mode(:stroke)
       |> Gutenex.write_text("xyz")
-      |> Gutenex.end_text()
+      |> Gutenex.end_text
       |> Gutenex.move_to(400, 20)
-      |> Gutenex.draw_image("./test/support/images/alpaca.png", %{
+      |> Gutenex.draw_image(alpaca_alias, %{
         translate_x: 300,
         translate_y: 500,
       })

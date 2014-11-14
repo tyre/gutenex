@@ -61,7 +61,7 @@ defmodule Gutenex.PDF.Builders.TemplateBuilder do
       %{
         "Type" => "XObject",
         "SubType" => "Form",
-        "BBox" => context.media_box,
+        "BBox" => {:array, Tuple.to_list(context.media_box)},
         "Resources" => {:dict, %{"ProcSet" => {:name, "PDF"}}}
       }
     }

@@ -144,18 +144,35 @@ defmodule Gutenex do
   #              Images               #
   #####################################
 
-  @doc """
-  Add an image by filename
-  """
-  def draw_image(pid, image_file_path) do
-    draw_image(pid, image_file_path, %{})
+
+  def add_image(pid, image_alias, %Imagineer.Image{}=image) do
+    GenServer.cast(pid, {:image, :add, {image_alias, image}})
+    pid
   end
 
-  def draw_image(pid, image_file_path, options) do
-    image = %Imagineer.Image{uri: image_file_path} |>
-            Imagineer.Image.load() |>
-            Imagineer.Image.process()
-    GenServer.cast(pid, {:image, :write, {image, options}})
+  @doc """
+  Add an image by alias
+  """
+  def draw_image(pid, image_alias) do
+    draw_image(pid, image_alias, %{})
+  end
+
+  def draw_image(pid, image_alias, options) do
+    GenServer.cast(pid, {:image, :write, {image_alias, options}})
+    pid
+  end
+
+  #####################################
+  #            Templates              #
+  #####################################
+
+  def add_template(pid, template_alias, template_contents) do
+    GenServer.cast(pid, {:templates, :add, {template_alias, template_contents}})
+    pid
+  end
+
+  def set_template(pid, template_alias) do
+    GenServer.cast(pid, {:template, :set, {template_alias}})
     pid
   end
 
@@ -267,14 +284,32 @@ defmodule Gutenex do
   end
 
   #####################################
+  #            Templates              #
+  #####################################
+
+  def handle_cast({:templates, :add, {template_alias, template_contents}}, [context, stream]) do
+    template_aliases =  Map.put context.template_aliases, template_alias, template_contents
+    {:noreply, [%Context{template_aliases: template_aliases}, stream]}
+  end
+
+  def handle_cast({:template, :set, {template_alias}}, [context, stream]) do
+    templates = List.replace_at(context.templates, context.current_page - 1, template_alias)
+    {:noreply, [%Context{context | templates: templates}, stream]}
+  end
+
+  #####################################
   #              Images               #
   #####################################
 
-  def handle_cast({:image, :write, {image, options}}, [context, stream]) do
-    image_alias = Gutenex.PDF.Images.image_alias(image)
+  def handle_cast({:image, :add, {image_alias, image}}, [context, stream]) do
     images =  Map.put context.images, image_alias, image
+    {:noreply, [%Context{context | images: images}, stream]}
+  end
+
+  def handle_cast({:image, :write, {image_alias, options}}, [context, stream]) do
+    image = Map.get context.images, image_alias
     stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image, options)
-    {:noreply, [%Context{ images: images}, stream]}
+    {:noreply, [context, stream]}
   end
 
   #####################################
