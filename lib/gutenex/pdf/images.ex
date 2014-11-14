@@ -4,7 +4,8 @@ defmodule Gutenex.PDF.Images do
 
   def set_image(image_alias, %Image{}=image, options\\%{}) do
     Graphics.with_state fn ->
-      scale(image_options(image, options)) <> draw_image(image_alias)
+      scale(image_options(image, options)) <>
+      Graphics.paint(image_alias)
     end
   end
 
@@ -31,10 +32,6 @@ defmodule Gutenex.PDF.Images do
     ], &to_string/1)
     |> Enum.join(" ")
     "#{scale_params} cm\n"
-  end
-
-  defp draw_image(image_alias) do
-    "/#{image_alias} Do\n"
   end
 
   def png_color(0), do: "DeviceGray"

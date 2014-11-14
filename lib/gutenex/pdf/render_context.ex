@@ -8,20 +8,25 @@ defmodule Gutenex.PDF.RenderContext do
     catalog: nil,
     meta_data: nil,
     page_tree: nil,
+    x_object_dictionary: nil,
     image_objects: [],
     font_objects: [],
     page_objects: [],
+    template_objects: [],
 
     # References
-    meta_data_reference: nil,
     catalog_reference: nil,
+    meta_data_reference: nil,
     page_tree_reference: nil,
+    x_object_dictionary_reference: nil,
     image_summary_reference: nil,
     page_references: [],
+    template_references: [],
 
     # Aliases
     font_aliases: %{},
-    image_aliases: %{}
+    image_aliases: %{},
+    template_aliases: %{}
   )
 
   @doc """
@@ -39,6 +44,14 @@ defmodule Gutenex.PDF.RenderContext do
   """
   def current_reference(%RenderContext{}=render_context) do
     {:ptr, render_context.current_index, render_context.generation_number}
+  end
+
+  @doc """
+  Returns an :obj with the current index and generation number of the provided
+  render context
+  """
+  def current_object(%RenderContext{}=render_context) do
+    {:obj, render_context.current_index, render_context.generation_number}
   end
 
   @doc """
@@ -61,7 +74,7 @@ defmodule Gutenex.PDF.RenderContext do
   def objects(%RenderContext{}=render_context) do
     render_context.image_objects ++
     render_context.font_objects ++
-    [render_context.page_tree | render_context.page_objects] ++
+    [render_context.x_object_dictionary, render_context.page_tree | render_context.page_objects] ++
     [render_context.catalog, render_context.meta_data]
   end
 

@@ -30,4 +30,22 @@ defmodule Gutenex.PDF.RenderContextTest do
     assert RenderContext.font_references(render_context) ==
            Map.values(render_context.font_aliases)
   end
+
+  test "#current_object returns an :obj with the current index and generation number" do
+    render_context = %RenderContext{
+      current_index: 17,
+      generation_number: 88
+    }
+    assert RenderContext.current_object(render_context) ==
+           {:obj, render_context.current_index, render_context.generation_number}
+  end
+
+  test "#current_reference returns a :ptr with the current index and generation number" do
+    render_context = %RenderContext{
+      current_index: 17,
+      generation_number: 88
+    }
+    assert RenderContext.current_reference(render_context) ==
+           {:ptr, render_context.current_index, render_context.generation_number}
+  end
 end

@@ -12,9 +12,9 @@ defmodule Gutenex.PDF.Builders.CatalogBuilderTest do
     }
     {updated_render_context, _context} = CatalogBuilder.build({render_context, %Context{}})
     assert updated_render_context.catalog_reference ==
-           {:ptr, render_context.current_index, render_context.generation_number}
+           RenderContext.current_reference(render_context)
     assert updated_render_context.catalog == {
-      {:obj, render_context.current_index, render_context.generation_number},
+      RenderContext.current_object(render_context),
       {:dict, %{
           "Type"  => {:name, "Catalog"},
           "Pages" => render_context.page_tree_reference

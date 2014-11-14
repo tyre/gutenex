@@ -38,7 +38,7 @@ defmodule Gutenex.PDF.Builders.PageBuilder do
 
   defp page_object(render_context, page) do
     {
-      {:obj, render_context.current_index, render_context.generation_number},
+      RenderContext.current_object(render_context),
       {:stream, page}
     }
   end
@@ -53,7 +53,7 @@ defmodule Gutenex.PDF.Builders.PageBuilder do
 
   defp page_summary(render_context) do
     {
-      {:obj, render_context.current_index, render_context.generation_number},
+      RenderContext.current_object(render_context),
       {:dict, %{
         "Type" => {:name, "Page"},
         "Parent" => render_context.page_tree_reference,
@@ -63,7 +63,7 @@ defmodule Gutenex.PDF.Builders.PageBuilder do
   end
 
   defp page_reference(render_context) do
-    {:ptr, render_context.current_index, render_context.generation_number}
+    RenderContext.current_reference(render_context)
   end
 
   defp add_page_references_to_page_tree(render_context) do
