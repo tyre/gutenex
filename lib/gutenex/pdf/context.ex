@@ -12,6 +12,8 @@ defmodule Gutenex.PDF.Context do
     },
     images: %{},
     fonts: Gutenex.PDF.Font.standard_fonts(),
+    templates: [],
+    template_aliases: %{},
     pages: [],
     scripts: [],
     convert_mode: "utf8_to_latin2",

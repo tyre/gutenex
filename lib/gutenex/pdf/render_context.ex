@@ -21,7 +21,6 @@ defmodule Gutenex.PDF.RenderContext do
     x_object_dictionary_reference: nil,
     image_summary_reference: nil,
     page_references: [],
-    template_references: [],
 
     # Aliases
     font_aliases: %{},
@@ -36,7 +35,6 @@ defmodule Gutenex.PDF.RenderContext do
   def next_index(%RenderContext{}=render_context) do
     %RenderContext{render_context | current_index: render_context.current_index + 1}
   end
-
 
   @doc """
   Returns a reference to the current index and generation number of the provided
@@ -72,10 +70,20 @@ defmodule Gutenex.PDF.RenderContext do
   Returns a list of all objects for rendering
   """
   def objects(%RenderContext{}=render_context) do
-    render_context.image_objects ++
-    render_context.font_objects ++
-    [render_context.x_object_dictionary, render_context.page_tree | render_context.page_objects] ++
-    [render_context.catalog, render_context.meta_data]
+    List.flatten([
+      render_context.x_object_dictionary,
+      render_context.page_tree,
+      render_context.image_objects,
+      render_context.font_objects,
+      render_context.template_objects,
+      render_context.page_objects,
+      render_context.catalog,
+      render_context.meta_data])
+    |> Enum.sort_by &object_sort/1
+  end
+
+  defp object_sort({{:obj, index, _}, _}) do
+    index
   end
 
   @doc """
