@@ -45,7 +45,7 @@ defmodule Gutenex.PDF.Builders.TemplateBuilderTest do
 
     assert template_contents == "Bubbles!"
     assert Map.get(template_dictionary, "Type")     == "XObject"
-    assert Map.get(template_dictionary, "BBox")     == context.media_box
+    assert Map.get(template_dictionary, "BBox")     == {:array, Tuple.to_list(context.media_box)}
     assert Map.get(template_dictionary, "SubType")  == "Form"
   end
 end

@@ -32,7 +32,7 @@ defmodule Gutenex.PDF.Builders.PageBuilderTest do
                               "Type" => {:name, "Page"},
                               "Parent" => page_tree_reference,
                               "Contents" => {:ptr, 1, 0},
-                              "TemplateInstantiated" => nil
+                              "TemplateInstantiated" => {:name, nil}
                             }}}
 
     assert page_2_contents  == {{:obj, 3, 0}, {:stream, page_2}}
@@ -41,7 +41,7 @@ defmodule Gutenex.PDF.Builders.PageBuilderTest do
                                 "Type" => {:name, "Page"},
                                 "Parent" => page_tree_reference,
                                 "Contents" => {:ptr, 3, 0},
-                                "TemplateInstantiated" => "Richard"
+                                "TemplateInstantiated" => {:name, "Richard"}
                                 }}}
 
     assert render_context.page_tree == {
