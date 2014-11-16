@@ -2,4 +2,4 @@
   "earmark": {:hex, :earmark, "0.1.10"},
   "erlguten": {:git, "git://github.com/SenecaSystems/erlguten.git", "c02b8fc57571615837b4b369cef3fecaa609436b", []},
   "ex_doc": {:hex, :ex_doc, "0.6.1"},
-  "imagineer": {:git, "git://github.com/SenecaSystems/imagineer.git", "c017d71f8c96dbf91a4ea8f33cea77c06fb97f07", []}}
+  "imagineer": {:hex, :imagineer, "0.1.0"}}
