@@ -47,12 +47,9 @@ defmodule GutenexTest do
   @tag :integration
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
-    {template_alias, template_contents} = Gutenex.PDF.Templates.load("./test/support/templates/cucumber_salads.pdf")
     {alpaca_alias, alpaca_rendition} = Gutenex.PDF.Images.load("./test/support/images/alpaca.png")
     {:ok, pid} = Gutenex.start_link
-      Gutenex.add_template(pid, template_alias, template_contents)
-      |> Gutenex.add_image(alpaca_alias, alpaca_rendition)
-      |> Gutenex.set_template(template_alias)
+    Gutenex.add_image(pid, alpaca_alias, alpaca_rendition)
       |> Gutenex.begin_text
       |> Gutenex.set_font("Helvetica", 48)
       |> Gutenex.text_position(40, 180)
