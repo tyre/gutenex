@@ -44,7 +44,7 @@ defmodule GutenexTest do
     assert "20 30 m\n" == Gutenex.stream(server)
   end
 
-  @tag integration: true
+  @tag :integration
   test "integration!" do
     File.rm("./tmp/alpaca.pdf")
     {template_alias, template_contents} = Gutenex.PDF.Templates.load("./test/support/templates/cucumber_salads.pdf")
