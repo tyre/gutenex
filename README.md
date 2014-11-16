@@ -1,4 +1,5 @@
 Gutenex
+[![Build Status](https://travis-ci.org/SenecaSystems/gutenex.svg?branch=master)](https://travis-ci.org/SenecaSystems/gutenex)
 =======
 
 PDF generation!
