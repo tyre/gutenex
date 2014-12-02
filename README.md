@@ -15,6 +15,7 @@ Rewriting the basic PDF functionality means:
 - [x] fonts
 - [x] images
 - [x] rendering/exporting
+- [ ] parsing existing PDFs
 - [ ] templating
 - [ ] documentation
 
