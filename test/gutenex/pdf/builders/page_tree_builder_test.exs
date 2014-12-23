@@ -25,7 +25,6 @@ defmodule Gutenex.PDF.PageTreeBuilderTest do
   test "#build" do
     # Set up the test context and variables
     context = %Context{media_box: Page.page_size(:a0)}
-    pages =
     render_context = %RenderContext{
       generation_number: 0,
       current_index: 99,

@@ -1,6 +1,5 @@
 defmodule Gutenex.PDF do
   require Record
-  alias Gutenex.Geometry.Line
   alias Gutenex.PDF.Context
 
   def export(%Context{} = context, stream) do

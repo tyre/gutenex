@@ -13,7 +13,7 @@ defmodule Gutenex.PDF.Builder do
   Takes in a PDF.Context and returns a PDF.RenderContext
   """
   def build(%Context{}=context) do
-    {render_context, ^context} = {%RenderContext{}, context}
+    {_render_context, ^context} = {%RenderContext{}, context}
       |> ImageBuilder.build
       |> FontBuilder.build
       |> PageTreeBuilder.build

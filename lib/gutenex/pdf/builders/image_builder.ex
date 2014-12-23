@@ -8,11 +8,11 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     {render_context, context}
   end
 
-  def add_images(%RenderContext{generation_number: generation_number}=render_context, []) do
+  def add_images(%RenderContext{}=render_context, []) do
     add_image_summary(render_context)
   end
 
-  def add_images(%RenderContext{generation_number: generation_number}=render_context, [{image_alias, current_image} | images_tail]) do
+  def add_images(%RenderContext{}=render_context, [{image_alias, current_image} | images_tail]) do
     add_image(render_context, current_image, image_alias)
     |> add_images(images_tail)
   end
