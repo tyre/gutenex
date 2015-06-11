@@ -3,6 +3,7 @@ defmodule Gutenex.PDF.RenderContext do
   defstruct(
     generation_number: 0,
     current_index: 1,
+    raw_source: nil,
 
     # Objects
     catalog: nil,

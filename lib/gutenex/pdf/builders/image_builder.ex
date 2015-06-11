@@ -9,7 +9,10 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   end
 
   def add_images(%RenderContext{}=render_context, []) do
-    add_image_summary(render_context)
+    %RenderContext{
+      render_context |
+      image_objects: Enum.reverse(render_context.image_objects)
+    }
   end
 
   def add_images(%RenderContext{}=render_context, [{image_alias, current_image} | images_tail]) do
