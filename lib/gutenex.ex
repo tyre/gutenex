@@ -274,7 +274,7 @@ defmodule Gutenex do
     image_alias = "Img#{Map.size(context.images)}"
     images =  Map.put context.images, image_alias, image
     stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image, options)
-    {:noreply, [%Context{ images: images}, stream]}
+    {:noreply, [%Context{ context | images: images}, stream]}
   end
 
   #####################################
