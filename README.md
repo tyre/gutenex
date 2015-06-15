@@ -4,6 +4,9 @@
 
 PDF generation!
 
+> So weird that it's still a thing for murderers in horror movies to keep clippings of their crimes. PDF that shit!
+— [Julieanne Smolinkski](https://twitter.com/BoobsRadley)
+
 
 What started out as a wrapper for the Erlang [erlguten](https://github.com/ztmr/erlguten) library has turned into a full rewrite in Elixir.
 
