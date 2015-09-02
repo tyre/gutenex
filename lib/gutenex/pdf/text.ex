@@ -21,6 +21,10 @@ defmodule Gutenex.PDF.Text do
     "(#{escape(text_to_write)}) Tj\n"
   end
 
+  def write_text_br(text_to_write) do
+    write_text(text_to_write) <> break_text
+  end
+
   def render_mode(mode) do
     "#{text_fill(mode)} Tr\n"
   end

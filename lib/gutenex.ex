@@ -85,6 +85,15 @@ defmodule Gutenex do
   end
 
   @doc """
+  Write text more break line to the stream
+  """
+  def write_text_br(pid, text_to_write) do
+    GenServer.cast(pid, {:text, :write_br, text_to_write})
+    pid
+  end
+  
+
+  @doc """
   End a text block
   """
   def end_text(pid) do
@@ -264,6 +273,14 @@ defmodule Gutenex do
   """
   def handle_cast({:text, :write, text_to_write}, [context, stream]) do
     stream = stream <> Text.write_text(text_to_write)
+    {:noreply, [context, stream]}
+  end
+
+  @doc """
+    Write some text more break line!
+  """
+  def handle_cast({:text, :write_br, text_to_write}, [context, stream]) do
+    stream = stream <> Text.write_text_br(text_to_write)
     {:noreply, [context, stream]}
   end
 
