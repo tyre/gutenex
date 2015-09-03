@@ -62,6 +62,6 @@ defmodule Gutenex.PDF.TextTest do
   end
 
   test "#line_spacing" do
-    assert Text.line_spacing(10) == "10 Tl\n"
+    assert Text.line_spacing(10) == "10 TL\n"
   end
 end

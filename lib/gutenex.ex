@@ -92,7 +92,14 @@ defmodule Gutenex do
     pid
   end
   
-
+  @doc """
+  Set line space
+  """
+  def text_leading(pid, size) do
+    GenServer.cast(pid, {:text, :line_spacing, size})
+    pid
+  end
+  
   @doc """
   End a text block
   """
@@ -284,6 +291,14 @@ defmodule Gutenex do
     {:noreply, [context, stream]}
   end
 
+  @doc """
+    Set line space
+  """
+  def handle_cast({:text, :line_spacing, size}, [context, stream]) do
+    stream = stream <> Text.line_spacing(size)
+    {:noreply, [context, stream]}
+  end
+  
   @doc """
     Set the text position
   """

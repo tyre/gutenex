@@ -83,6 +83,6 @@ defmodule Gutenex.PDF.Text do
   # leading." Text leading is only used by the T*, ', and 
   # " operators. Initial value: 0. 
   def line_spacing(spacing) do
-    "#{spacing} Tl\n"
+    "#{spacing} TL\n"
   end
 end
