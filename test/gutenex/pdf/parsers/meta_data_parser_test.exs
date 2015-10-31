@@ -4,7 +4,7 @@ defmodule Gutenex.PDF.MetaDataParserTest do
 
   setup do
     {:ok, %{
-      file: File.read!("./test/support/MozillaProcessManagement.pdf")
+      file: File.read!("./test/support/VonnegutQuotes.pdf")
     }}
   end
 

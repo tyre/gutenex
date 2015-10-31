@@ -4,6 +4,8 @@ defmodule Gutenex.Pdf.Parsers.DocumentParser do
   Parses a complete PDF document, minus any updates.
   """
 
+  @xref_content ~r/startxref|trailer/
+
   # Lines can end in a newline, a carriage return, both, and/or some spaces
   @eol "[\n\r\s]+"
 
@@ -20,7 +22,11 @@ defmodule Gutenex.Pdf.Parsers.DocumentParser do
     context = parse_xref_locations(context)
     Enum.reduce(context.xref_byte_offsets, context, fn (xref_byte_offset, context) ->
       xref = parse_xref(context, xref_byte_offset)
-      %ParseContext{context | xrefs: context.xrefs ++ [xref],  objects: context.objects ++ xref.objects}
+      %ParseContext{
+        context |
+        xrefs: context.xrefs ++ [xref],
+        objects: context.objects ++ xref.objects
+      }
     end)
   end
 
@@ -39,11 +45,11 @@ defmodule Gutenex.Pdf.Parsers.DocumentParser do
   def parse_xref(context, xref_location) do
     bytes_until_end = byte_size(context.document) - xref_location
     xref_until_end = :binary.part(context.document, xref_location, bytes_until_end)
-    [xref, trailer, _rest] = Regex.split(~r/startxref|trailer/, xref_until_end, parts: 2)
+    [xref, trailer] = Regex.split(@xref_content, xref_until_end, parts: 2)
     %ParseContext{
       context |
       objects: parse_objects(xref),
-      trailer: []
+      trailer: parse_trailer(trailer)
     }
   end
 
@@ -51,11 +57,8 @@ defmodule Gutenex.Pdf.Parsers.DocumentParser do
     Gutenex.Pdf.Parsers.XrefParser.parse(xref).entries
   end
 
-  def parse_trailer(trailer) do
-    ""
-  end
-
-  def index_of(regex, string) do
-
+  # Well this is probably wrong
+  def parse_trailer(_trailer) do
+    [""]
   end
 end

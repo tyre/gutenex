@@ -38,7 +38,7 @@ defmodule Gutenex.Pdf.Parsers.XrefParser do
         }
     )
 
-  def parse(<< "xref", rest::binary>>) do
+  def parse(<<"xref", rest::binary>>) do
     [object_range | entries] = Regex.split(@eol, String.strip(rest))
     parse_object_range(%Xref{}, object_range)
     |> parse_object_entries(entries)

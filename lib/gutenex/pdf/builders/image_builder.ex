@@ -27,10 +27,9 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     |> RenderContext.next_index
   end
 
-  @doc """
-  Calculate the attributes, any additional objects, and add the image to the
-  list of images
-  """
+
+  # Calculate the attributes, any additional objects, and add the image to the
+  # list of images
   defp add_image_object(%RenderContext{}=render_context, %Imagineer.Image{format: :png}=image) do
     image_object = {
       RenderContext.current_object(render_context),
@@ -45,10 +44,8 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     }
   end
 
-  @doc """
-  Adds the alias to the RenderContext#image_aliases map, under the assumption
-  that the current index is that of the image object
-  """
+  # Adds the alias to the RenderContext#image_aliases map, under the assumption
+  # that the current index is that of the image object
   defp add_image_alias(render_context, image_alias) do
     image_reference = RenderContext.current_reference(render_context)
     %RenderContext{
@@ -69,10 +66,8 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     }
   end
 
-  @doc """
-  PNGs with color type 2 have no extra object
-  returns the render_context
-  """
+  # PNGs with color type 2 have no extra object
+  # returns the render_context
   defp add_image_extra_object(render_context, %Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}) do
     render_context
   end
