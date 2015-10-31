@@ -4,8 +4,25 @@ defmodule Gutenex.PDF.Images do
 
   def set_image(image_alias, %Image{}=image, options\\%{}) do
     Graphics.with_state fn ->
-      scale(image_options(image, options)) <> draw_image(image_alias)
+      scale(image_options(image, options)) <>
+      Graphics.paint(image_alias)
     end
+  end
+
+  # So named because `alias` is not something I want to redefine
+  def image_alias(%Image{uri: uri}=image) when not is_nil(uri) do
+    :crypto.md5(uri)
+    |> Base.encode16
+  end
+
+  def load(file_path) do
+    image = %Image{uri: file_path}
+      |> Image.load
+      |> Image.process
+    {
+      image_alias(image),
+      image
+    }
   end
 
   defp image_options(image, options) do
@@ -31,10 +48,6 @@ defmodule Gutenex.PDF.Images do
     ], &to_string/1)
     |> Enum.join(" ")
     "#{scale_params} cm\n"
-  end
-
-  defp draw_image(image_alias) do
-    "/#{image_alias} Do\n"
   end
 
   def png_color(0), do: "DeviceGray"

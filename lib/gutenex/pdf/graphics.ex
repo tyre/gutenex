@@ -1,5 +1,9 @@
 defmodule Gutenex.PDF.Graphics do
 
+  def paint(aliaz) do
+    "/#{aliaz} Do\n"
+  end
+
   def save_state do
     "q\n"
   end

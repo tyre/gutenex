@@ -9,7 +9,7 @@ defmodule Gutenex.PDF.Builders.PageBuilderTest do
     page_2 = "alpha beta gamma delta"
     page_tree_reference = {:ptr, 39, 0}
 
-    context = %Context{pages: [page_1, page_2]}
+    context = %Context{pages: [page_1, page_2], templates: [nil, "Richard"]}
     {render_context, ^context} = PageBuilder.build({
       %RenderContext{
         page_tree_reference: page_tree_reference,
@@ -31,14 +31,18 @@ defmodule Gutenex.PDF.Builders.PageBuilderTest do
       {:obj, 2, 0}, {:dict, %{
                               "Type" => {:name, "Page"},
                               "Parent" => page_tree_reference,
-                              "Contents" => {:ptr, 1, 0}}}}
+                              "Contents" => {:ptr, 1, 0},
+                              "TemplateInstantiated" => {:name, nil}
+                            }}}
 
     assert page_2_contents  == {{:obj, 3, 0}, {:stream, page_2}}
     assert page_2_summary   == {
       {:obj, 4, 0}, {:dict, %{
                                 "Type" => {:name, "Page"},
                                 "Parent" => page_tree_reference,
-                                "Contents" => {:ptr, 3, 0}}}}
+                                "Contents" => {:ptr, 3, 0},
+                                "TemplateInstantiated" => {:name, "Richard"}
+                                }}}
 
     assert render_context.page_tree == {
       {:obj, 1, 0},

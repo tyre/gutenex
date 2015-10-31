@@ -9,20 +9,24 @@ defmodule Gutenex.PDF.RenderContext do
     catalog: nil,
     meta_data: nil,
     page_tree: nil,
+    x_object_dictionary: nil,
     image_objects: [],
     font_objects: [],
     page_objects: [],
+    template_objects: [],
 
     # References
-    meta_data_reference: nil,
     catalog_reference: nil,
+    meta_data_reference: nil,
     page_tree_reference: nil,
+    x_object_dictionary_reference: nil,
     image_summary_reference: nil,
     page_references: [],
 
     # Aliases
     font_aliases: %{},
-    image_aliases: %{}
+    image_aliases: %{},
+    template_aliases: %{}
   )
 
   @doc """
@@ -33,13 +37,20 @@ defmodule Gutenex.PDF.RenderContext do
     %RenderContext{render_context | current_index: render_context.current_index + 1}
   end
 
-
   @doc """
   Returns a reference to the current index and generation number of the provided
   render context
   """
   def current_reference(%RenderContext{}=render_context) do
     {:ptr, render_context.current_index, render_context.generation_number}
+  end
+
+  @doc """
+  Returns an :obj with the current index and generation number of the provided
+  render context
+  """
+  def current_object(%RenderContext{}=render_context) do
+    {:obj, render_context.current_index, render_context.generation_number}
   end
 
   @doc """
@@ -60,10 +71,20 @@ defmodule Gutenex.PDF.RenderContext do
   Returns a list of all objects for rendering
   """
   def objects(%RenderContext{}=render_context) do
-    render_context.image_objects ++
-    render_context.font_objects ++
-    [render_context.page_tree | render_context.page_objects] ++
-    [render_context.catalog, render_context.meta_data]
+    List.flatten([
+      render_context.x_object_dictionary,
+      render_context.page_tree,
+      render_context.image_objects,
+      render_context.font_objects,
+      render_context.template_objects,
+      render_context.page_objects,
+      render_context.catalog,
+      render_context.meta_data])
+    |> Enum.sort_by &object_sort/1
+  end
+
+  defp object_sort({{:obj, index, _}, _}) do
+    index
   end
 
   @doc """

@@ -9,7 +9,10 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   end
 
   def add_images(%RenderContext{}=render_context, []) do
-    add_image_summary(render_context)
+    %RenderContext{
+      render_context |
+      image_objects: Enum.reverse(render_context.image_objects)
+    }
   end
 
   def add_images(%RenderContext{}=render_context, [{image_alias, current_image} | images_tail]) do
@@ -24,25 +27,13 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     |> RenderContext.next_index
   end
 
-  def add_image_summary(%RenderContext{}=render_context) do
-    summary = {
-      {:obj, render_context.current_index, render_context.generation_number},
-      {:dict, render_context.image_aliases}
-    }
-    %RenderContext{
-      RenderContext.next_index(render_context) |
-      image_summary_reference: {:ptr, render_context.current_index, render_context.generation_number},
-      image_objects: Enum.reverse([summary|render_context.image_objects])
-    }
-  end
-
   @doc """
   Calculate the attributes, any additional objects, and add the image to the
   list of images
   """
   defp add_image_object(%RenderContext{}=render_context, %Imagineer.Image{format: :png}=image) do
     image_object = {
-      {:obj, render_context.current_index, render_context.generation_number},
+      RenderContext.current_object(render_context),
       {:stream,
         image_attributes(image, extra_attributes(image)),
         image.content
@@ -59,7 +50,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   that the current index is that of the image object
   """
   defp add_image_alias(render_context, image_alias) do
-    image_reference = {:ptr, render_context.current_index, render_context.generation_number}
+    image_reference = RenderContext.current_reference(render_context)
     %RenderContext{
       render_context |
       image_aliases: Map.put(render_context.image_aliases, image_alias, image_reference)
