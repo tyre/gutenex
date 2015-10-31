@@ -12,7 +12,7 @@ defmodule Gutenex.PDF.ParserTest do
     context = Parser.parse file
     assert context.version == "1.3"
     assert length(context.updates) == 0
-    assert length(context.objects) == 70
+    assert length(context.objects) == 71
   end
 end
 

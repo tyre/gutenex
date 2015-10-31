@@ -30,9 +30,9 @@ defmodule Gutenex.Pdf.Parsers.XrefParser do
         ...> 0000045738 00005 n
         ...> """
         %Gutenex.Pdf.Xref{
-          object_start: 0,
-          object_end: 2,
-          entries: [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,
+          object_start: 12,
+          object_end: 12,
+          entries: [
             %Gutenex.Pdf.Xref.ObjectEntry{object_number: 12, byte_offset: 45738, generation_number: 5, free: false}
           ]
         }
