@@ -30,6 +30,13 @@ defmodule Gutenex do
   #######################
 
   @doc """
+  Stop the server process
+  """
+  def stop(pid) do
+    GenServer.call(pid, :stop)
+  end
+
+  @doc """
   Returns the current context
   """
   def context(pid) do
@@ -91,7 +98,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :write_br, text_to_write})
     pid
   end
-  
+
   @doc """
   Set line space
   """
@@ -99,7 +106,7 @@ defmodule Gutenex do
     GenServer.cast(pid, {:text, :line_spacing, size})
     pid
   end
-  
+
   @doc """
   End a text block
   """
@@ -209,6 +216,12 @@ defmodule Gutenex do
   ##   Call handlers   ##
   #######################
 
+  @doc """
+  Handles stopping the server process
+  """
+  def handle_call(:stop, _from, state) do
+    {:stop, :normal, :ok, state}
+  end
 
   @doc """
   Returns the current context
@@ -298,7 +311,7 @@ defmodule Gutenex do
     stream = stream <> Text.line_spacing(size)
     {:noreply, [context, stream]}
   end
-  
+
   @doc """
     Set the text position
   """

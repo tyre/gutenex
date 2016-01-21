@@ -6,6 +6,15 @@ defmodule GutenexTest do
     {:ok, %{server: server_pid}}
   end
 
+  test "can stop server" do
+    {:ok, server_pid} = Gutenex.start_link()
+    assert Process.alive? server_pid
+
+    :ok = Gutenex.stop(server_pid)
+
+    assert !Process.alive? server_pid
+  end
+
   test "getting the context", %{server: server} do
     assert %Gutenex.PDF.Context{} == Gutenex.context(server)
   end

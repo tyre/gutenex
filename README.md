@@ -27,7 +27,7 @@ Rewriting the basic PDF functionality means:
 ```elixir
   # Load image, get alias
   {alpaca_alias, alpaca_rendition} = Gutenex.PDF.Images.load("./test/support/images/alpaca.png")
-  
+
   {:ok, pid} = Gutenex.start_link
   Gutenex.add_image(pid, alpaca_alias, alpaca_rendition)
     |> Gutenex.begin_text
@@ -45,6 +45,7 @@ Rewriting the basic PDF functionality means:
       translate_y: 500,
     })
     |> Gutenex.export("./tmp/alpaca.pdf")
+    |> Gutenex.stop
 ```
 
 Now open up that file and you should see some text near the bottom and a picture
