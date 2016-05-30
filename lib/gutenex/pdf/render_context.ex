@@ -79,7 +79,7 @@ defmodule Gutenex.PDF.RenderContext do
       render_context.page_objects,
       render_context.catalog,
       render_context.meta_data])
-    |> Enum.sort_by &object_sort/1
+    |> Enum.sort_by(&object_sort/1)
   end
 
   defp object_sort({{:obj, index, _}, _}) do

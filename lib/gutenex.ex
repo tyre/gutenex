@@ -168,7 +168,7 @@ defmodule Gutenex do
   #####################################
 
 
-  def add_image(pid, image_alias, %Imagineer.Image{}=image) do
+  def add_image(pid, image_alias, %Imagineer.Image.PNG{}=image) do
     GenServer.cast(pid, {:image, :add, {image_alias, image}})
     pid
   end

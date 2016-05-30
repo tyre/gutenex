@@ -1,8 +1,8 @@
 defmodule Gutenex.PDF.Images do
   alias Gutenex.PDF.Graphics
-  alias Imagineer.Image
+  alias Imagineer.Image.PNG
 
-  def set_image(image_alias, %Image{}=image, options\\%{}) do
+  def set_image(image_alias, %PNG{}=image, options\\%{}) do
     Graphics.with_state fn ->
       scale(image_options(image, options)) <>
       Graphics.paint(image_alias)
@@ -10,15 +10,13 @@ defmodule Gutenex.PDF.Images do
   end
 
   # So named because `alias` is not something I want to redefine
-  def image_alias(%Image{uri: uri}=image) when not is_nil(uri) do
-    :crypto.md5(uri)
+  def image_alias(image) do
+    :crypto.hash(:md5, (:crypto.rand_bytes(100)))
     |> Base.encode16
   end
 
   def load(file_path) do
-    image = %Image{uri: file_path}
-      |> Image.load
-      |> Image.process
+    {:ok, image} = Imagineer.load(file_path)
     {
       image_alias(image),
       image

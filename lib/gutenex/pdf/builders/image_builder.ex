@@ -31,12 +31,12 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   Calculate the attributes, any additional objects, and add the image to the
   list of images
   """
-  defp add_image_object(%RenderContext{}=render_context, %Imagineer.Image{format: :png}=image) do
+  defp add_image_object(%RenderContext{}=render_context, %Imagineer.Image.PNG{}=image) do
     image_object = {
       RenderContext.current_object(render_context),
       {:stream,
         image_attributes(image, extra_attributes(image)),
-        image.content
+        Imagineer.Image.PNG.to_binary(image)
       }
     }
     %RenderContext{
@@ -60,10 +60,10 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   @doc """
   Extra attributes specific to the image format, color type, or other attributes
   """
-  def extra_attributes(%Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}=image) do
+  def extra_attributes(%Imagineer.Image.PNG{color_type: 2 }=image) do
     %{
       "Filter"            => {:name, "FlateDecode"},
-      "ColorSpace"        => {:name, Images.png_color(image.attributes.color_type)},
+      "ColorSpace"        => {:name, Images.png_color(image.color_type)},
       "DecodeParms"       => decode_params(image),
       "BitsPerComponent"  => image.bit_depth
     }
@@ -73,7 +73,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   PNGs with color type 2 have no extra object
   returns the render_context
   """
-  defp add_image_extra_object(render_context, %Imagineer.Image{format: :png, attributes: %{ color_type: 2 }}) do
+  defp add_image_extra_object(render_context, %Imagineer.Image.PNG{ color_type: 2 }) do
     render_context
   end
 
@@ -92,7 +92,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     {
       :dict,
       %{
-        "Colors"            => Images.png_bits(image.attributes.color_type),
+        "Colors"            => Images.png_bits(image.color_type),
         "Columns"           => image.width,
         "Predictor"         => 15,
         "BitsPerComponent"  => image.bit_depth

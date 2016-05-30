@@ -15,13 +15,7 @@ defmodule GutenexTest do
     assert !Process.alive? server_pid
   end
 
-  test "getting the context", %{server: server} do
-    assert %Gutenex.PDF.Context{} == Gutenex.context(server)
-  end
-
   test "setting the context", %{server: server} do
-    assert %Gutenex.PDF.Context{} == Gutenex.context(server)
-
     new_context = %Gutenex.PDF.Context{ meta_data: %{ author: "Kurt Vonnegut", title: "Slaughterhouse-five"} }
     Gutenex.context(server, new_context)
 
@@ -43,9 +37,9 @@ defmodule GutenexTest do
   end
 
   test "setting the current page", %{server: server} do
-    assert %Gutenex.PDF.Context{current_page: 1} == Gutenex.context(server)
+    assert 1 == Gutenex.context(server).current_page
     Gutenex.set_page(server, 2)
-    assert %Gutenex.PDF.Context{current_page: 2} == Gutenex.context(server)
+    assert 2 == Gutenex.context(server).current_page
   end
 
   test "#move_to", %{server: server} do

@@ -70,13 +70,13 @@ defmodule Gutenex.PDF.Serialization do
 
   def serialize({:array, elements}) when is_list(elements) do
     inner = Enum.map(elements, &serialize/1)
-    |> Enum.join ","
+    |> Enum.join(",")
     " [" <> inner <> "] "
   end
 
   def serialize({:rect, elements}) do
     inner = Enum.map(elements, &serialize/1)
-    |> Enum.join " "
+    |> Enum.join(" ")
     " [" <> inner <> "] "
   end
 
