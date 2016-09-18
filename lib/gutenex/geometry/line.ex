@@ -1,6 +1,10 @@
 defmodule Gutenex.Geometry.Line do
   import Gutenex.Geometry
 
+  def line_width(number) do
+    "#{number} w q "
+  end
+
   def line({from_point, to_point}) do
     move_to(from_point) <>
     draw_line(to_point) <>
