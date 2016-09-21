@@ -212,6 +212,16 @@ defmodule Gutenex do
     pid
   end
 
+  def line(pid, {point_start, point_finish}) do
+    GenServer.cast(pid, {:geometry, :line, {point_start, point_finish}})
+    pid
+  end
+
+  def line_width(pid, width) do
+    GenServer.cast(pid, {:geometry, :line_width, width})
+    pid
+  end
+
   #######################
   ##   Call handlers   ##
   #######################
@@ -383,6 +393,16 @@ defmodule Gutenex do
 
   def handle_cast({:geometry, :move_to, {point_x, point_y}}, [context, stream]) do
     stream = stream <> Geometry.move_to({point_x, point_y})
+    {:noreply, [context, stream]}
+  end
+
+  def handle_cast({:geometry, :line, {point_start, point_finish}}, [context, stream]) do
+    stream = stream <> Geometry.Line.line({point_start, point_finish})
+    {:noreply, [context, stream]}
+  end
+
+  def handle_cast({:geometry, :line_width, width}, [context, stream]) do
+    stream = stream <> Geometry.Line.line_width(width)
     {:noreply, [context, stream]}
   end
 end

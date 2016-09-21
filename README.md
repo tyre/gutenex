@@ -50,3 +50,12 @@ Rewriting the basic PDF functionality means:
 
 Now open up that file and you should see some text near the bottom and a picture
 of what I believe to be an alpaca. Could also be a llama.
+
+By default, coordinates are in units of 1/72 inch as per the PDF
+spec. Origin is in lower left corner of the page. This is roughly 1
+point in printing terms.
+
+```
+  Gutenex.line_width(pid, 0.01)          # very fine line
+  |> Gutenex.line({{0, 0}, {500, 500}})  # up and to the right
+```
