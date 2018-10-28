@@ -25,7 +25,7 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize(float) when is_float(float) do
-    Float.to_string(float, [decimals: 2])
+    :erlang.float_to_binary(float, [decimals: 2])
   end
 
   def serialize(integer) when is_integer(integer) do
@@ -124,8 +124,8 @@ defmodule Gutenex.PDF.Serialization do
   end
 
   def serialize_dictionary_pair({key, value}) do
-    serialized_key = String.strip(serialize({:name, key}))
-    serialized_value = String.strip(serialize(value))
+    serialized_key = String.trim(serialize({:name, key}))
+    serialized_value = String.trim(serialize(value))
     serialized_key <> " " <> serialized_value
   end
 

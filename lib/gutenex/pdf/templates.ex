@@ -9,6 +9,6 @@ defmodule Gutenex.PDF.Templates do
 
   def template_alias(template_path) do
     Base.hex_encode32(template_path)
-    |> String.strip(?=)
+    |> String.trim("=")
   end
 end

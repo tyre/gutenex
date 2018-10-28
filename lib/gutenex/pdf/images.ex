@@ -10,8 +10,8 @@ defmodule Gutenex.PDF.Images do
   end
 
   # So named because `alias` is not something I want to redefine
-  def image_alias(image) do
-    :crypto.hash(:md5, (:crypto.rand_bytes(100)))
+  def image_alias(_image) do
+    :crypto.hash(:md5, (:crypto.strong_rand_bytes(100)))
     |> Base.encode16
   end
 
@@ -32,7 +32,7 @@ defmodule Gutenex.PDF.Images do
       skew_x: 0,
       skew_y: 0
     }
-    Dict.merge(default_options, options)
+    Map.merge(default_options, options)
   end
 
   defp scale(options) do

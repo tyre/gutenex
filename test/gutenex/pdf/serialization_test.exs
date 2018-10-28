@@ -64,7 +64,7 @@ defmodule Gutenex.PDF.SerializationTest do
 
   test "#serialize with a :stream with no options" do
     assert Serialization.serialize({:stream, "AHHHHHHHHHHHHHHHHHH"}) ==
-           String.rstrip("""
+           String.trim_trailing("""
            <</Length 19>>
            stream
            AHHHHHHHHHHHHHHHHHH

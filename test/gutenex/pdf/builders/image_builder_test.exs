@@ -6,7 +6,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilderTest do
 
   setup do
     {:ok, image} = Imagineer.load("./test/support/images/alpaca.png")
-    image_x_object = {100, [{{:obj, 100, 30}, {:stream, {:dict, %{"Type" => {:name, "XObject"}, "Subtype" => {:name, "Image"}, "Width" => 96, "Height" => 96, "Filter" => {:name, "FlateDecode"}, "BitsPerComponent" => 8, "DecodeParms" => {:dict, %{"Predictor" => 15, "Colors" => 3, "BitsPerComponent" => 8, "Columns" => 96}}, "ColorSpace" => {:name, "DeviceRGB"}}}, Imagineer.Image.PNG.to_binary(image)}}, []]}
+    image_x_object = {100, [{{:obj, 100, 30}, {:stream, {:dict, %{"Type" => {:name, "XObject"}, "Subtype" => {:name, "Image"}, "Width" => 96, "Height" => 96, "Filter" => {:name, "FlateDecode"}, "BitsPerComponent" => 8, "DecodeParams" => {:dict, %{"Predictor" => 15, "Colors" => 3, "BitsPerComponent" => 8, "Columns" => 96}}, "ColorSpace" => {:name, "DeviceRGB"}}}, Imagineer.Image.PNG.to_binary(image)}}, []]}
     {:ok, %{image: image, image_x_object: image_x_object}}
   end
 

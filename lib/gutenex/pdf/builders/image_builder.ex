@@ -32,17 +32,29 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
   list of images
   """
   defp add_image_object(%RenderContext{}=render_context, %Imagineer.Image.PNG{}=image) do
+    image_stream_data = Imagineer.Image.PNG.Pixels.NoInterlace.encode(image)
+      |> Enum.join
+      |> compress_image_data
     image_object = {
       RenderContext.current_object(render_context),
       {:stream,
         image_attributes(image, extra_attributes(image)),
-        Imagineer.Image.PNG.to_binary(image)
+        image_stream_data
       }
     }
     %RenderContext{
       render_context |
       image_objects: [image_object | render_context.image_objects]
     }
+  end
+
+  defp compress_image_data(decompressed_data) do
+    zlib_stream = :zlib.open()
+    :ok = :zlib.deflateInit(zlib_stream)
+    compressed_data = :zlib.deflate(zlib_stream, decompressed_data, :finish)
+    :ok = :zlib.deflateEnd(zlib_stream)
+    :ok = :zlib.close(zlib_stream)
+    :binary.list_to_bin(compressed_data)
   end
 
   @doc """
@@ -64,7 +76,7 @@ defmodule Gutenex.PDF.Builders.ImageBuilder do
     %{
       "Filter"            => {:name, "FlateDecode"},
       "ColorSpace"        => {:name, Images.png_color(image.color_type)},
-      "DecodeParms"       => decode_params(image),
+      "DecodeParams"      => decode_params(image),
       "BitsPerComponent"  => image.bit_depth
     }
   end
