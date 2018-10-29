@@ -1,23 +1,22 @@
 defmodule Gutenex.PDF.Page do
   use Gutenex.PDF.Page.PageSizes
 
-  def to_pdf( parent_reference, contents_reference, generation_number, options \\ %{}) do
+  def to_pdf(parent_reference, contents_reference, generation_number, options \\ %{}) do
     {
       :dict,
       [
         {"Type", {:name, "Page"}},
         {"Parent", {:ptr, parent_reference, generation_number}},
-        {"Contents", {:ptr, contents_reference, generation_number}} |
-        Enum.map(options, &page_option(&1))
+        {"Contents", {:ptr, contents_reference, generation_number}}
+        | Enum.map(options, &page_option(&1))
       ]
     }
   end
 
   defp page_option({key, value}) do
-    atom_to_page_key(key) |>
-    page_option(value)
+    atom_to_page_key(key)
+    |> page_option(value)
   end
-
 
   defp page_option("LastModified", value) do
     {"LastModified", {:date, value}}
@@ -190,6 +189,4 @@ defmodule Gutenex.PDF.Page do
   def page_size(:tabloid) do
     page_size(@tabloid)
   end
-
-
 end

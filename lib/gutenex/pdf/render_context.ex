@@ -31,7 +31,7 @@ defmodule Gutenex.PDF.RenderContext do
   Returns RenderContext where the render context's current_index
   has been incremented by one
   """
-  def next_index(%__MODULE__{}=render_context) do
+  def next_index(%__MODULE__{} = render_context) do
     %__MODULE__{render_context | current_index: render_context.current_index + 1}
   end
 
@@ -39,7 +39,7 @@ defmodule Gutenex.PDF.RenderContext do
   Returns a reference to the current index and generation number of the provided
   render context
   """
-  def current_reference(%__MODULE__{}=render_context) do
+  def current_reference(%__MODULE__{} = render_context) do
     {:ptr, render_context.current_index, render_context.generation_number}
   end
 
@@ -47,28 +47,28 @@ defmodule Gutenex.PDF.RenderContext do
   Returns an :obj with the current index and generation number of the provided
   render context
   """
-  def current_object(%__MODULE__{}=render_context) do
+  def current_object(%__MODULE__{} = render_context) do
     {:obj, render_context.current_index, render_context.generation_number}
   end
 
   @doc """
   Returns a list of all font references for the given render context
   """
-  def font_references(%__MODULE__{}=render_context) do
-    Map.values render_context.font_aliases
+  def font_references(%__MODULE__{} = render_context) do
+    Map.values(render_context.font_aliases)
   end
 
   @doc """
   Returns a list of all image references for the given render context
   """
-  def image_references(%__MODULE__{}=render_context) do
-    Map.values render_context.image_aliases
+  def image_references(%__MODULE__{} = render_context) do
+    Map.values(render_context.image_aliases)
   end
 
   @doc """
   Returns a list of all objects for rendering
   """
-  def objects(%__MODULE__{}=render_context) do
+  def objects(%__MODULE__{} = render_context) do
     List.flatten([
       render_context.x_object_dictionary,
       render_context.page_tree,
@@ -77,7 +77,8 @@ defmodule Gutenex.PDF.RenderContext do
       render_context.template_objects,
       render_context.page_objects,
       render_context.catalog,
-      render_context.meta_data])
+      render_context.meta_data
+    ])
     |> Enum.sort_by(&object_sort/1)
   end
 
@@ -87,11 +88,13 @@ defmodule Gutenex.PDF.RenderContext do
 
   @doc """
   """
-  def trailer(%__MODULE__{}=render_context) do
-    {:trailer, {:dict, %{
-      "Size" => length(objects(render_context)) + 1,
-      "Root" => render_context.catalog_reference,
-      "Info" => render_context.meta_data_reference
-    }}}
+  def trailer(%__MODULE__{} = render_context) do
+    {:trailer,
+     {:dict,
+      %{
+        "Size" => length(objects(render_context)) + 1,
+        "Root" => render_context.catalog_reference,
+        "Info" => render_context.meta_data_reference
+      }}}
   end
 end

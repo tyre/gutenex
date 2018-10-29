@@ -1,5 +1,4 @@
 defmodule Gutenex.PDF.Utils do
-
   # Base case, escaping the empty string is the empty string
   def escape(<<>>) do
     <<>>

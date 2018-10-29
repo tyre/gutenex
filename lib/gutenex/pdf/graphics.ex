@@ -1,5 +1,4 @@
 defmodule Gutenex.PDF.Graphics do
-
   def paint(aliaz) do
     "/#{aliaz} Do\n"
   end
@@ -13,11 +12,10 @@ defmodule Gutenex.PDF.Graphics do
   end
 
   def with_state(fun) do
-    Enum.join [
+    Enum.join([
       save_state(),
       fun.(),
       restore_state()
-    ]
+    ])
   end
-
 end

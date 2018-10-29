@@ -11,7 +11,7 @@ defmodule Gutenex.Mixfile do
       deps: deps(),
       description: description(),
       package: package()
-   ]
+    ]
   end
 
   def application do
@@ -20,8 +20,8 @@ defmodule Gutenex.Mixfile do
 
   defp deps do
     [
-      {:imagineer, "~> 0.3" },
-      {:ex_doc, "~> 0.19", only: :dev },
+      {:imagineer, "~> 0.3"},
+      {:ex_doc, "~> 0.19", only: :dev},
       {:apex, "~>1.0"}
     ]
   end

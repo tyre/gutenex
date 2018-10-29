@@ -28,7 +28,6 @@ defmodule Gutenex.PDF.Text do
   def render_mode(mode) do
     "#{text_fill(mode)} Tr\n"
   end
-  
 
   # :fill                 Fill text
   # :stroke               Stroke text
@@ -38,15 +37,14 @@ defmodule Gutenex.PDF.Text do
   # :stroke_clip          Stroke text and add to path for clipping
   # :fill_stroke_clip     Fill, then stroke text and add to path for clipping
   # :clip                 Add text to path for clipping
-  def text_fill(:fill),             do: 0
-  def text_fill(:stroke),           do: 1
-  def text_fill(:fill_stroke),      do: 2
-  def text_fill(:invisible),        do: 3
-  def text_fill(:fill_clip),        do: 4
-  def text_fill(:stroke_clip),      do: 5
+  def text_fill(:fill), do: 0
+  def text_fill(:stroke), do: 1
+  def text_fill(:fill_stroke), do: 2
+  def text_fill(:invisible), do: 3
+  def text_fill(:fill_clip), do: 4
+  def text_fill(:stroke_clip), do: 5
   def text_fill(:fill_stroke_clip), do: 6
-  def text_fill(:clip),             do: 7
-  
+  def text_fill(:clip), do: 7
 
   # Moves to the next line and positions the cursor offset by
   # (x_coordinate, y_coordinate)
@@ -71,7 +69,7 @@ defmodule Gutenex.PDF.Text do
   # It is very important to achieve webscale
   defp normalized_scale_percentage(:web), do: 9001
   defp normalized_scale_percentage(anything_else), do: anything_else
-  
+
   # Set the word spacing, Tw, to `spacing`, a number 
   # expressed in unscaled text space units. Word spacing is used by 
   # the Tj, TJ, and ' operators. Initial value: 0. 

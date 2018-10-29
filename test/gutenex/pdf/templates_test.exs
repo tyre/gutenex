@@ -5,7 +5,8 @@ defmodule Gutenex.PDF.TemplatesTest do
   test "#load" do
     contents = File.read!("./test/support/templates/cucumber_salads.pdf")
     template_alias = Templates.template_alias("./test/support/templates/cucumber_salads.pdf")
+
     assert {template_alias, contents} ==
-           Templates.load("./test/support/templates/cucumber_salads.pdf")
+             Templates.load("./test/support/templates/cucumber_salads.pdf")
   end
 end

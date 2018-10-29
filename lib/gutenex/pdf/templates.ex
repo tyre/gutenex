@@ -1,5 +1,4 @@
 defmodule Gutenex.PDF.Templates do
-
   def load(path) do
     {
       template_alias(path),

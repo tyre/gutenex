@@ -4,7 +4,6 @@ defmodule Gutenex.Geometry.BezierText do
   # test "#bezier"
 end
 
-
 # bezier(X1, Y1, X2, Y2, X3, Y3, X4, Y4)->
 #     bezier({X1, Y1}, {X2, Y2}, {X3, Y3}, {X4, Y4}).
 
