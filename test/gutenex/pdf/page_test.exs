@@ -2,25 +2,28 @@ defmodule Gutenex.PDF.PageTest do
   use ExUnit.Case, async: true
   alias Gutenex.PDF.Page
 
-
   test "#to_pdf with no options should build the object" do
-    expected = {:dict, [
-        {"Type", {:name, "Page"}},
-        {"Parent", {:ptr, 5, 3}},
-        {"Contents", {:ptr, 1_000, 3}}]}
-    assert Page.to_pdf(5, 1_000, 3) ==  expected
+    expected =
+      {:dict,
+       [{"Type", {:name, "Page"}}, {"Parent", {:ptr, 5, 3}}, {"Contents", {:ptr, 1_000, 3}}]}
+
+    assert Page.to_pdf(5, 1_000, 3) == expected
   end
 
   test "#to_pdf with options should translate them to strings" do
-    options = %{last_modified: {{2014, 1, 31},{15, 15, 00}}}
+    options = %{last_modified: {{2014, 1, 31}, {15, 15, 00}}}
     generation_number = 7
-    expected = {:dict, [
-        {"Type", {:name, "Page"}},
-        {"Parent", {:ptr, 5, generation_number}},
-        {"Contents", {:ptr, 1_000, generation_number}},
-        {"LastModified", {:date, options[:last_modified]}}
-      ]}
-    assert Page.to_pdf(5, 1_000, generation_number, options) ==  expected
+
+    expected =
+      {:dict,
+       [
+         {"Type", {:name, "Page"}},
+         {"Parent", {:ptr, 5, generation_number}},
+         {"Contents", {:ptr, 1_000, generation_number}},
+         {"LastModified", {:date, options[:last_modified]}}
+       ]}
+
+    assert Page.to_pdf(5, 1_000, generation_number, options) == expected
   end
 
   test "#page_size with arbitrary width and height" do

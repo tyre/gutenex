@@ -9,7 +9,7 @@ defmodule Gutenex.PDF.FontTest do
     assert Font.set_font(Font.standard_fonts(), "Helvetica") == "/Helvetica 12 Tf\n",
            "it defaults the size to 12"
 
-    assert Font.set_font(Font.standard_fonts(), "Bananas")   == "/Helvetica 12 Tf\n",
+    assert Font.set_font(Font.standard_fonts(), "Bananas") == "/Helvetica 12 Tf\n",
            "it defaults the font to Helvetica when font is not found"
   end
 end

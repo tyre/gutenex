@@ -1,11 +1,9 @@
 defmodule Gutenex do
   use GenServer
   alias Gutenex.PDF
-  alias Gutenex.PDF.Context
   alias Gutenex.PDF.Text
   alias Gutenex.PDF.Font
-
-  alias Gutenex.Geometry
+  alias Gutenex.PDF.Geometry
 
   #######################
   ##       Setup       ##
@@ -22,7 +20,7 @@ defmodule Gutenex do
   Returns the default context and stream (empty binary)
   """
   def init(:ok) do
-    {:ok, [%Context{}, <<>>]}
+    {:ok, [%Gutenex.PDF.Context{}, <<>>]}
   end
 
   #######################
@@ -158,17 +156,15 @@ defmodule Gutenex do
   end
 
   def export(pid, file_name) do
-    File.write file_name, export(pid)
+    File.write(file_name, export(pid))
     pid
   end
-
 
   #####################################
   #              Images               #
   #####################################
 
-
-  def add_image(pid, image_alias, %Imagineer.Image.PNG{}=image) do
+  def add_image(pid, image_alias, %Imagineer.Image.PNG{} = image) do
     GenServer.cast(pid, {:image, :add, {image_alias, image}})
     pid
   end
@@ -207,18 +203,8 @@ defmodule Gutenex do
     move_to(pid, {point_x, point_y})
   end
 
-  def move_to(pid, {point_x, point_y}=point) when is_integer(point_x) and is_integer(point_y) do
+  def move_to(pid, {point_x, point_y} = point) when is_integer(point_x) and is_integer(point_y) do
     GenServer.cast(pid, {:geometry, :move_to, point})
-    pid
-  end
-
-  def line(pid, {point_start, point_finish}) do
-    GenServer.cast(pid, {:geometry, :line, {point_start, point_finish}})
-    pid
-  end
-
-  def line_width(pid, width) do
-    GenServer.cast(pid, {:geometry, :line_width, width})
     pid
   end
 
@@ -278,7 +264,7 @@ defmodule Gutenex do
   Sets the current page
   """
   def handle_cast({:context, :put, {key, value}}, [context, stream]) do
-    new_context = Map.put context, key, value
+    new_context = Map.put(context, key, value)
     {:noreply, [new_context, stream]}
   end
 
@@ -286,7 +272,7 @@ defmodule Gutenex do
     Begin a section of text
   """
   def handle_cast({:text, :begin}, [context, stream]) do
-    stream = stream <> Text.begin_text
+    stream = stream <> Text.begin_text()
     {:noreply, [context, stream]}
   end
 
@@ -294,7 +280,7 @@ defmodule Gutenex do
     End a section of text
   """
   def handle_cast({:text, :end}, [context, stream]) do
-    stream = stream <> Text.end_text
+    stream = stream <> Text.end_text()
     {:noreply, [context, stream]}
   end
 
@@ -343,13 +329,13 @@ defmodule Gutenex do
   #####################################
 
   def handle_cast({:templates, :add, {template_alias, template_contents}}, [context, stream]) do
-    template_aliases =  Map.put context.template_aliases, template_alias, template_contents
-    {:noreply, [%Context{template_aliases: template_aliases}, stream]}
+    template_aliases = Map.put(context.template_aliases, template_alias, template_contents)
+    {:noreply, [%Gutenex.PDF.Context{template_aliases: template_aliases}, stream]}
   end
 
   def handle_cast({:template, :set, {template_alias}}, [context, stream]) do
     templates = List.replace_at(context.templates, context.current_page - 1, template_alias)
-    {:noreply, [%Context{context | templates: templates}, stream]}
+    {:noreply, [%Gutenex.PDF.Context{context | templates: templates}, stream]}
   end
 
   #####################################
@@ -357,12 +343,12 @@ defmodule Gutenex do
   #####################################
 
   def handle_cast({:image, :add, {image_alias, image}}, [context, stream]) do
-    images =  Map.put context.images, image_alias, image
-    {:noreply, [%Context{context | images: images}, stream]}
+    images = Map.put(context.images, image_alias, image)
+    {:noreply, [%Gutenex.PDF.Context{context | images: images}, stream]}
   end
 
   def handle_cast({:image, :write, {image_alias, options}}, [context, stream]) do
-    image = Map.get context.images, image_alias
+    image = Map.get(context.images, image_alias)
     stream = stream <> Gutenex.PDF.Images.set_image(image_alias, image, options)
     {:noreply, [context, stream]}
   end
@@ -393,16 +379,6 @@ defmodule Gutenex do
 
   def handle_cast({:geometry, :move_to, {point_x, point_y}}, [context, stream]) do
     stream = stream <> Geometry.move_to({point_x, point_y})
-    {:noreply, [context, stream]}
-  end
-
-  def handle_cast({:geometry, :line, {point_start, point_finish}}, [context, stream]) do
-    stream = stream <> Geometry.Line.line({point_start, point_finish})
-    {:noreply, [context, stream]}
-  end
-
-  def handle_cast({:geometry, :line_width, width}, [context, stream]) do
-    stream = stream <> Geometry.Line.line_width(width)
     {:noreply, [context, stream]}
   end
 end

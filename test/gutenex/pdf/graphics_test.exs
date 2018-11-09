@@ -12,8 +12,8 @@ defmodule Gutenex.PDF.GraphicsTest do
 
   test "#with_state" do
     assert Graphics.with_state(fn ->
-      "Bubbles!"
-    end) == "#{Graphics.save_state()}Bubbles!#{Graphics.restore_state()}"
+             "Bubbles!"
+           end) == "#{Graphics.save_state()}Bubbles!#{Graphics.restore_state()}"
   end
 
   test "#paint" do

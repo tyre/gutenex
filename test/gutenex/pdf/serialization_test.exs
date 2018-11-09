@@ -12,7 +12,7 @@ defmodule Gutenex.PDF.SerializationTest do
   end
 
   test "#serialize with a integer" do
-    assert Serialization.serialize(112392093810293) == "112392093810293"
+    assert Serialization.serialize(112_392_093_810_293) == "112392093810293"
   end
 
   test "#serialize with a float should format it" do
@@ -28,10 +28,10 @@ defmodule Gutenex.PDF.SerializationTest do
   end
 
   test "#serialize with a :date" do
-    assert Serialization.serialize({:date, {{2014, 1, 31},{15, 15, 00}}}) ==
-           " (D:20140131151500) "
-    assert Serialization.serialize({:date, {1776, 7, 4}}) ==
-           " (D:17760704000000) "
+    assert Serialization.serialize({:date, {{2014, 1, 31}, {15, 15, 00}}}) ==
+             " (D:20140131151500) "
+
+    assert Serialization.serialize({:date, {1776, 7, 4}}) == " (D:17760704000000) "
   end
 
   test "#serialize with a :name" do
@@ -40,12 +40,13 @@ defmodule Gutenex.PDF.SerializationTest do
 
   test "#serialize with an :array" do
     assert Serialization.serialize({:array, [1, {:string, "Two"}, 3.0, {:date, {1776, 7, 4}}]}) ==
-           " [1, (Two) ,3.00, (D:17760704000000) ] "
+             " [1, (Two) ,3.00, (D:17760704000000) ] "
   end
 
   test "#serialize with a :dict using a map" do
-    assert Serialization.serialize({:dict, %{"Key" => "Value", "Numbers" => {:array, [1, 2, 3]}, "Nope" => nil}}) ==
-    "<</Key (Value)/Numbers [1,2,3]>>"
+    assert Serialization.serialize(
+             {:dict, %{"Key" => "Value", "Numbers" => {:array, [1, 2, 3]}, "Nope" => nil}}
+           ) == "<</Key (Value)/Numbers [1,2,3]>>"
   end
 
   test "#serialize with a :ptr" do
@@ -53,33 +54,35 @@ defmodule Gutenex.PDF.SerializationTest do
   end
 
   test "#serialize with a :rect" do
-    assert Serialization.serialize({:rect, [1, 2, 3, 4]}) ==
-           " [1 2 3 4] "
+    assert Serialization.serialize({:rect, [1, 2, 3, 4]}) == " [1 2 3 4] "
   end
 
   test "#serialize with a :hexstring" do
-    assert Serialization.serialize({:hexstring, "Yay Bubbles!"}) ==
-           " <59617920427562626C657321> "
+    assert Serialization.serialize({:hexstring, "Yay Bubbles!"}) == " <59617920427562626C657321> "
   end
 
   test "#serialize with a :stream with no options" do
     assert Serialization.serialize({:stream, "AHHHHHHHHHHHHHHHHHH"}) ==
-           String.rstrip("""
-           <</Length 19>>
-           stream
-           AHHHHHHHHHHHHHHHHHH
-           endstream
-           """)
+             String.trim_trailing("""
+             <</Length 19>>
+             stream
+             AHHHHHHHHHHHHHHHHHH
+             endstream
+             """)
   end
 
   test "#serialize the :trailer" do
-    assert Serialization.serialize({:trailer, {:dict, %{
-      "Size" => 200,
-      "Root" => {:ptr, 200, 0},
-      "Info" => {:ptr, 5, 1}
-    }}}) == """
-    trailer
-    <</Info 5 1 R/Root 200 0 R/Size 200>>
-    """
+    assert Serialization.serialize(
+             {:trailer,
+              {:dict,
+               %{
+                 "Size" => 200,
+                 "Root" => {:ptr, 200, 0},
+                 "Info" => {:ptr, 5, 1}
+               }}}
+           ) == """
+           trailer
+           <</Info 5 1 R/Root 200 0 R/Size 200>>
+           """
   end
 end

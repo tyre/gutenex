@@ -9,6 +9,7 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
       generation_number: 3,
       current_index: 100
     }
+
     context = %Context{
       meta_data: %{
         creator: "Thomas Paine",
@@ -20,6 +21,7 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
         keywords: "free-mp3s how-to-build-a-startup-online stock-tips"
       }
     }
+
     {:ok, %{render_context: render_context, context: context}}
   end
 
@@ -35,12 +37,12 @@ defmodule Gutenex.PDF.Builders.MetaDataBuilderTest do
 
     assert new_render_context.meta_data_reference == {:ptr, 100, 3}
     assert new_render_context.current_index == meta_data_index + 1
-    assert Map.get(meta_data, "Title")        ==  {:string, context.meta_data.title}
-    assert Map.get(meta_data, "Author")       ==  {:string, context.meta_data.author}
-    assert Map.get(meta_data, "Creator")      ==  {:string, context.meta_data.creator}
-    assert Map.get(meta_data, "Subject")      ==  {:string, context.meta_data.subject}
-    assert Map.get(meta_data, "Producer")     ==  {:string, context.meta_data.producer}
-    assert Map.get(meta_data, "Keywords")     ==  {:string, context.meta_data.keywords}
-    assert Map.get(meta_data, "CreationDate") ==  {:date, context.meta_data.creation_date}
+    assert Map.get(meta_data, "Title") == {:string, context.meta_data.title}
+    assert Map.get(meta_data, "Author") == {:string, context.meta_data.author}
+    assert Map.get(meta_data, "Creator") == {:string, context.meta_data.creator}
+    assert Map.get(meta_data, "Subject") == {:string, context.meta_data.subject}
+    assert Map.get(meta_data, "Producer") == {:string, context.meta_data.producer}
+    assert Map.get(meta_data, "Keywords") == {:string, context.meta_data.keywords}
+    assert Map.get(meta_data, "CreationDate") == {:date, context.meta_data.creation_date}
   end
 end
